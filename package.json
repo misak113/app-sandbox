@@ -1,0 +1,41 @@
+{
+  "name": "app-sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "back.js",
+  "author": "Michael Zabka <zabka.michael@gmail.com> (http://zabka.avantcore.cz/)",
+  "scripts": {
+    "prepublish": "./node_modules/.bin/gulp",
+    "test": "./node_modules/.bin/gulp test",
+    "start": "node back.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/misak113/app-sandbox.git"
+  },
+  "license": "ISC",
+  "homepage": "https://github.com/misak113/app-sandbox#readme",
+  "dependencies": {
+    "di-ts": "0.0.30",
+    "express": "^4.13.3",
+    "moment": "^2.10.6",
+    "react": "^0.13.3",
+    "serve-static": "^1.10.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-develop-server": "^0.4.3",
+    "gulp-less": "^3.0.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-tsd": "0.0.4",
+    "gulp-typescript": "^2.9.2",
+    "gulp-watch-less": "^1.0.1",
+    "merge2": "^0.3.6",
+    "tsd": "^0.6.5",
+    "tslint": "=2.2.0-beta",
+    "typescript": "^1.7.0-dev.20151004"
+  }
+}

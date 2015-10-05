@@ -1,0 +1,11 @@
+.env.json
+node_modules/*
+dist/*
+typings/*
+!.gitkeep
+
+.idea/
+*.sublime-workspace
+
+Thumbs.db
+ehthumbs.db
