@@ -5,6 +5,7 @@ require './build-js'
 develop = require './develop-js'
 
 gulp.task 'watch-js', ['build-js', 'develop-js'], ->
+  process.env.GULP_ENV = "watch"
   files = paths.ts.src.concat([
     paths.tsd.src
   ])
