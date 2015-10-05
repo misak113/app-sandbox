@@ -2,7 +2,7 @@
 import * as express from 'express';
 import * as serveStatic from 'serve-static';
 import {Inject, Provide} from 'di-ts';
-import {ExpressServer} from './config/injector';
+import ExpressServer from './Http/ExpressServer';
 
 @Inject
 export default class Server {
