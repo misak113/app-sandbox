@@ -5,8 +5,12 @@ server = require 'gulp-develop-server'
 require './build-js'
 
 gulp.task 'develop-js', ['build-js'], ->
-  server.listen {
-    path: paths.back.mainFile
-  }
-
-module.exports.restart = server.restart
+  if server.child
+    server.restart()
+  else
+    server.listen {
+      path: paths.back.mainFile,
+      env: {
+        PORT: process.env.PORT || 8083
+      }
+    }
