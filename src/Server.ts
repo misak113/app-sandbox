@@ -1,7 +1,7 @@
 
 import * as express from 'express';
 import * as serveStatic from 'serve-static';
-import {Inject, Provide} from 'di-ts';
+import {Inject} from 'di-ts';
 import ExpressServer from './Http/ExpressServer';
 
 @Inject
