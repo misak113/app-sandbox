@@ -14,3 +14,5 @@ gulp.task 'develop-js', ['build-js'], ->
         PORT: process.env.PORT || 8083
       }
     }
+    process.on 'exit', ->
+      server.kill()
