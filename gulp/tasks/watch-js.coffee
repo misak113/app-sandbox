@@ -3,10 +3,11 @@ gulp = require 'gulp'
 paths = require '../config/paths'
 require './build-js'
 require './develop-js'
+require './test-specs-js'
 
-gulp.task 'watch-js', ['build-js', 'develop-js'], ->
+gulp.task 'watch-js', ['build-js', 'test-specs-js', 'develop-js'], ->
   process.env.GULP_ENV = "watch"
   files = paths.ts.src.concat([
     paths.tsd.src
   ])
-  return gulp.watch files, ['build-js', 'develop-js']
+  return gulp.watch files, ['build-js', 'test-specs-js', 'develop-js']
