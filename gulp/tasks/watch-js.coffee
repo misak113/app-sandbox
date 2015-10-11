@@ -7,7 +7,9 @@ require './test-specs-js'
 
 gulp.task 'watch-js', ['build-js', 'test-specs-js', 'develop-js'], ->
   process.env.GULP_ENV = "watch"
-  files = paths.ts.src.concat([
+  files = paths.ts.src.concat(
+    paths.ts.specs
+  ).concat([
     paths.tsd.src
   ])
   return gulp.watch files, ['build-js', 'test-specs-js', 'develop-js']
