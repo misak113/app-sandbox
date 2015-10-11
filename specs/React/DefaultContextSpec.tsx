@@ -179,4 +179,69 @@ describe('React.DefaultContext', () => {
 		var body = React.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Alfred</div>');
 	});
+
+	it('should setup default context for nested components also', () => {
+		var injector = new InjectorConstructor();
+
+		class Sign {
+			constructor(
+				public type = 'Stop'
+			) {}
+		}
+
+		@Inject
+		class CarContext {
+			constructor(
+				public rider: Rider
+			) { }
+		}
+
+		@DefaultContext(CarContext)
+		class Car extends Component<{}, {}> {
+
+			context: CarContext;
+
+			render() {
+				return <div>{this.context.rider.name}</div>;
+			}
+		}
+
+		@Inject
+		class RodeContext {
+			constructor(
+				public sign: Sign
+			) {}
+		}
+
+		@DefaultContext(RodeContext)
+		class Rode extends Component<{}, {}> {
+
+			context: RodeContext;
+
+			render() {
+				return <div>{this.context.sign.type} - <Car/></div>;
+			}
+		}
+
+		class App extends Component<{ injector: Injector }, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					injector: this.props.injector
+				};
+			}
+
+			render() {
+				return <Rode/>;
+			}
+		}
+
+		var app = React.createElement(App, { injector: injector });
+		var body = React.renderToStaticMarkup(app);
+		expect(body).toBe('<div>Stop - <div>Michael</div></div>');
+	});
 });
