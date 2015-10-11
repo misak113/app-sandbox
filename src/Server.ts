@@ -14,8 +14,8 @@ export default class Server {
 	start() {
 		console.log('Start Server');
 		var app = this.expressServer.App;
-		app.use(serveStatic(__dirname + '/../../src', { 'index': ['index.html'] }));
-		app.use(serveStatic(__dirname + '/../../dist'));
+		app.use(serveStatic(__dirname + '/../../../src', { 'index': ['index.html'] }));
+		app.use(serveStatic(__dirname + '/../../../dist'));
 		var port = process.env.PORT || 80;
 		app.listen(port, () => console.info('Listen on port ' + port));
 	}

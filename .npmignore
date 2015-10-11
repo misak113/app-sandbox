@@ -1,5 +1,5 @@
 node_modules/
-tests/
+specs/
 .gitignore
 .travis.yml
 tsd.json

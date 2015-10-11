@@ -10,14 +10,18 @@ paths = {
   back:
     mainFile: basePath + '/' + npmConfig.main
   ts:
-  	config: basePath + '/tsconfig.json'
-  	src: [
+    config: basePath + '/tsconfig.json'
+    src: [
       basePath + '/src/**/*.ts'
       basePath + '/src/**/*.tsx'
     ]
+    specs: [
+      basePath + '/specs/**/*.ts'
+      basePath + '/specs/**/*.tsx'
+    ]
   tsd:
-  	config: basePath + '/tsd.json'
-  	src: basePath + '/typings/tsd.d.ts'
+    config: basePath + '/tsd.json'
+    src: basePath + '/typings/tsd.d.ts'
   less:
     src: basePath + '/src/index.less'
 }
