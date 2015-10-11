@@ -1,7 +1,7 @@
 /// <reference path="../../node_modules/di-ts/di-ts.d.ts" />
 
 import DefaultContext from '../../src/React/DefaultContext';
-import {Inject, Injector as InjectorConstructor} from 'di-ts';
+import {Inject, Provide, Injector as InjectorConstructor} from 'di-ts';
 import {Injector} from 'di';
 import * as React from 'react';
 import {PropTypes, Component} from 'react';
@@ -243,5 +243,85 @@ describe('React.DefaultContext', () => {
 		var app = React.createElement(App, { injector: injector });
 		var body = React.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Stop - <div>Michael</div></div>');
+	});
+
+	it('should allow to override injector by any component', () => {
+		var injector = new InjectorConstructor();
+
+		@Provide(Rider)
+		class RaceRider {
+			constructor(
+				public name = 'Alonzo'
+			) { }
+		}
+
+		var injectorWithRacers = new InjectorConstructor([
+			RaceRider
+		]);
+
+		@Inject
+		class CarContext {
+			constructor(
+				public rider: Rider
+			) { }
+		}
+
+		@DefaultContext(CarContext)
+		class Car extends Component<{}, {}> {
+
+			context: CarContext;
+
+			render() {
+				return <div>{this.context.rider.name}</div>;
+			}
+		}
+
+		@Inject
+		class RodeContext {
+			constructor(
+				public allowedRider: Rider
+			) { }
+		}
+
+		@DefaultContext(RodeContext)
+		class Rode extends Component<{}, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			context: RodeContext;
+
+			getChildContext() {
+				return {
+					injector: injectorWithRacers
+				};
+			}
+
+			render() {
+				return <div>{this.context.allowedRider.name} is not <Car/></div>;
+			}
+		}
+
+		class App extends Component<{ injector: Injector }, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					injector: this.props.injector
+				};
+			}
+
+			render() {
+				return <Rode/>;
+			}
+		}
+
+		var app = React.createElement(App, { injector: injector });
+		var body = React.renderToStaticMarkup(app);
+		expect(body).toBe('<div>Michael is not <div>Alonzo</div></div>');
 	});
 });
