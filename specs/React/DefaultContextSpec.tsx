@@ -7,50 +7,176 @@ import * as React from 'react';
 import {PropTypes, Component} from 'react';
 
 describe('React.DefaultContext', () => {
-
 	class Rider {
-		public name = 'Michael';
-	}
-
-	var injector = new InjectorConstructor();
-
-	@Inject
-	class CarContext {
 		constructor(
-			public rider: Rider
+			public name = 'Michael'
 		) { }
 	}
 
-	@DefaultContext(CarContext)
-	class Car extends Component<{}, {}> {
-
-		context: CarContext;
-
-		render() {
-			return <div>{this.context.rider.name}</div>;
-		}
-	}
-
-	class App extends Component<{ injector: Injector }, {}> {
-
-		static childContextTypes: React.ValidationMap<any> = {
-			injector: PropTypes.object
-		};
-
-		getChildContext() {
-			return {
-				injector: this.props.injector
-			};
-		}
-
-		render() {
-			return <Car/>;
-		}
-	}
-
 	it('should set default context to react component', () => {
+		var injector = new InjectorConstructor();
+
+		@Inject
+		class CarContext {
+			constructor(
+				public rider: Rider
+			) { }
+		}
+
+		@DefaultContext(CarContext)
+		class Car extends Component<{}, {}> {
+
+			context: CarContext;
+
+			render() {
+				return <div>{this.context.rider.name}</div>;
+			}
+		}
+
+		class App extends Component<{ injector: Injector }, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					injector: this.props.injector
+				};
+			}
+
+			render() {
+				return <Car/>;
+			}
+		}
+
 		var app = React.createElement(App, { injector: injector });
 		var body = React.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Michael</div>');
+	});
+
+	it('should override default context from parent context definition', () => {
+		var injector = new InjectorConstructor();
+
+		@Inject
+		class BikeContext {
+			constructor(
+				public rider: Rider
+			) { }
+		}
+
+		@DefaultContext(BikeContext)
+		class Bike extends Component<{}, {}> {
+
+			static contextTypes: React.ValidationMap<any> = {
+				rider: PropTypes.object
+			};
+
+			context: BikeContext;
+
+			render() {
+				return <div>{this.context.rider.name}</div>;
+			}
+		}
+
+		class Street extends Component<{}, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				rider: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					rider: new Rider('Daniel')
+				};
+			}
+
+			render() {
+				return <Bike/>;
+			}
+		}
+
+		class App extends Component<{ injector: Injector }, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					injector: this.props.injector
+				};
+			}
+
+			render() {
+				return <Street/>;
+			}
+		}
+
+		var app = React.createElement(App, { injector: injector });
+		var body = React.renderToStaticMarkup(app);
+		expect(body).toBe('<div>Daniel</div>');
+	});
+
+	it('should override default context from parent context definition changing type of context value', () => {
+		var injector = new InjectorConstructor();
+
+		@Inject
+		class CarContext {
+			constructor(
+				public rider: Rider
+			) { }
+		}
+
+		@DefaultContext(CarContext)
+		class Car extends Component<{}, {}> {
+
+			context: CarContext;
+			static contextTypes: React.ValidationMap<any> = {
+				rider: PropTypes.string.isRequired
+			};
+
+			render() {
+				return <div>{this.context.rider}</div>;
+			}
+		}
+
+		class Rode extends Component<{}, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				rider: PropTypes.string
+			};
+
+			getChildContext() {
+				return {
+					rider: 'Alfred'
+				};
+			}
+
+			render() {
+				return <Car/>;
+			}
+		}
+
+		class App extends Component<{ injector: Injector }, {}> {
+
+			static childContextTypes: React.ValidationMap<any> = {
+				injector: PropTypes.object
+			};
+
+			getChildContext() {
+				return {
+					injector: this.props.injector
+				};
+			}
+
+			render() {
+				return <Rode/>;
+			}
+		}
+
+		var app = React.createElement(App, { injector: injector });
+		var body = React.renderToStaticMarkup(app);
+		expect(body).toBe('<div>Alfred</div>');
 	});
 });

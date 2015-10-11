@@ -7,12 +7,14 @@ import {Injector} from 'di';
 
 export default function DefaultContext(Context: any): ClassDecorator {
 	return (Component: ComponentClass<any>) => {
-		return class ComponentWithContext {
+		class ComponentWithContext {
 
 			static contextTypes = {
 				injector: PropTypes.object
 			};
-			static childContextTypes = {};
+			static childContextTypes = {
+				injector: PropTypes.object
+			};
 
 			public props: any;
 			public context: {
@@ -23,12 +25,16 @@ export default function DefaultContext(Context: any): ClassDecorator {
 				Component.contextTypes = Component.contextTypes || {};
 				var context = this.context.injector.get(Context);
 				Object.keys(context).forEach((key: string) => {
+					if (!Component.contextTypes[key]) {
+						Component.contextTypes[key] = PropTypes.any.isRequired;
+					}
 					ComponentWithContext.childContextTypes[key] = PropTypes.any.isRequired;
-					Component.contextTypes[key] = PropTypes.any.isRequired;
 				});
 				Object.keys(this.context).forEach((key: string) => {
+					if (!Component.contextTypes[key]) {
+						Component.contextTypes[key] = PropTypes.any.isRequired;
+					}
 					context[key] = this.context[key];
-					ComponentWithContext.childContextTypes[key] = PropTypes.any;
 				});
 				return context;
 			}
@@ -36,6 +42,11 @@ export default function DefaultContext(Context: any): ClassDecorator {
 			render() {
 				return <Component {...this.props}/>;
 			}
-		} as any as ComponentClass<any>;
+		}
+		var contextTypes = Component.contextTypes || {};
+		Object.keys(contextTypes).forEach((key: string) => {
+			ComponentWithContext.contextTypes[key] = contextTypes[key];
+		});
+		return ComponentWithContext as any as ComponentClass<any>;
 	}
 }
