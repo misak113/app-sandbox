@@ -19,17 +19,23 @@ export default class Homepage extends Component<{}, { nowHumanized?: string }, H
 
 	constructor(props, context) {
 		super(props, context);
-		this.state = {};
+		this.state = {
+			nowHumanized: this.getHumanizedTime()
+		};
 	}
 
 	componentDidMount() {
 		this.nowInterval = setInterval(() => this.setState({
-			nowHumanized: this.context.dateFactory.now().toString()
+			nowHumanized: this.getHumanizedTime()
 		}), 1000);
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.nowInterval);
+	}
+
+	private getHumanizedTime() {
+		return this.context.dateFactory.now().toString();
 	}
 
 	render() {
