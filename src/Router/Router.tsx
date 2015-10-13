@@ -20,7 +20,14 @@ export class RouterContext {
 }
 
 @DefaultContext(RouterContext)
-export default class Router extends Component<{}, {}, RouterContext> {
+export default class Router extends Component<{ doctype?: string }, { doctype?: string }, RouterContext> {
+
+	constructor(props, context) {
+		super(props, context);
+		this.state = {
+			doctype: props.doctype || '<!doctype html>'
+		};
+	}
 
 	private handler(request: Request, response: Response, next: () => void) {
 		var startTime = process.hrtime();
@@ -43,7 +50,7 @@ export default class Router extends Component<{}, {}, RouterContext> {
 					"X-Render-Time": Math.round(totalTime[0] * 1E3 + totalTime[1] / 1E6 * 1E2) / 1E2 + " ms"
 				};
 				response.status(200)
-					.header(header).send(body);
+					.header(header).send(this.state.doctype + body);
 			} else {
 				response.status(404).send('Not found');
 			}
