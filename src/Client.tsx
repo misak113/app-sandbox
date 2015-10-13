@@ -11,17 +11,13 @@ export interface IClientProps {
 	injector: Injector;
 }
 
-export interface IClientChildContext {
-	injector: Injector;
-}
-
 export default class Client extends Component<IClientProps, {}, {}> {
 
 	static childContextTypes: ValidationMap<any> = {
 		injector: PropTypes.object
 	};
 
-	getChildContext(): IClientChildContext {
+	getChildContext() {
 		return {
 			injector: this.props.injector
 		};

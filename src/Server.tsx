@@ -15,10 +15,6 @@ export interface IServerState {
 	expressServer: ExpressServer;
 }
 
-export interface IServerChildContext {
-	injector: Injector;
-}
-
 export default class Server extends Component<IServerProps, IServerState, {}> {
 
 	static childContextTypes: ValidationMap<any> = {
@@ -32,7 +28,7 @@ export default class Server extends Component<IServerProps, IServerState, {}> {
 		};
 	}
 
-	getChildContext(): IServerChildContext {
+	getChildContext() {
 		return {
 			injector: this.props.injector
 		};
