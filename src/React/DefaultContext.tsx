@@ -2,26 +2,28 @@
 
 import 'reflect-metadata';
 import * as React from 'react';
-import {PropTypes, ComponentClass, Component} from 'react';
+import {PropTypes, ComponentClass, ValidationMap} from 'react';
+import ReactComponent from './Component';
 import {Injector} from 'di';
+import {InjectorMissingException} from './exceptions';
 
 export default function DefaultContext(Context: any): ClassDecorator {
 	return (Component: ComponentClass<any>) => {
-		class ComponentWithContext {
+		class ComponentWithContext extends ReactComponent<any, any, { injector: Injector }> {
 
-			static contextTypes = {
+			static contextTypes: ValidationMap<any> = {
 				injector: PropTypes.object
 			};
-			static childContextTypes = {
+			static childContextTypes: ValidationMap<any> = {
 				injector: PropTypes.object
 			};
 
 			public props: any;
-			public context: {
-				injector: Injector;
-			};
 
 			getChildContext() {
+				if (!this.context.injector) {
+					throw new InjectorMissingException('You must pass injector to context of any parent component');
+				}
 				Component.contextTypes = Component.contextTypes || {};
 				var context = this.context.injector.get(Context);
 				Object.keys(context).forEach((key: string) => {

@@ -17,10 +17,14 @@
   "license": "ISC",
   "homepage": "https://github.com/misak113/app-sandbox#readme",
   "dependencies": {
+    "di": "^2.0.0-pre-14",
     "di-ts": "0.0.30",
     "express": "^4.13.3",
+    "history": "^1.12.5",
     "moment": "^2.10.6",
-    "react": "^0.13.3",
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0",
+    "react-router": "^1.0.0-rc3",
     "reflect-metadata": "^0.1.2",
     "serve-static": "^1.10.0",
     "underscore": "^1.8.3"
@@ -46,5 +50,5 @@
   "engines": {
     "node": ">=4.0.0"
   },
-  "engineStrict": true
+  "engine-strict": true
 }
