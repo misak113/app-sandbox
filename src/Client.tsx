@@ -1,32 +1,31 @@
 
 import * as React from 'react';
-import {PropTypes} from 'react';
+import {PropTypes, ValidationMap} from 'react';
 import Component from './React/Component';
 import {Injector} from 'di';
-import Main from './Layout/Main';
-import injector from './config/injector';
+import routes from './config/routes';
+var Router = require('react-router').Router;
+var history = require('history');
 
 export interface IClientProps {
 	injector: Injector;
 }
 
-export interface IClientChildContext {
-	injector: Injector;
-}
-
 export default class Client extends Component<IClientProps, {}, {}> {
 
-	static childContextTypes = {
+	static childContextTypes: ValidationMap<any> = {
 		injector: PropTypes.object
 	};
 
-	public getChildContext(): IClientChildContext {
+	getChildContext() {
 		return {
 			injector: this.props.injector
 		};
 	}
 	
 	render() {
-		return <Main/>;
+		return (
+			<Router routes={routes} history={history.createHistory({})}/>
+		);
 	}
 }

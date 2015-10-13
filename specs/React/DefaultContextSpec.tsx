@@ -4,7 +4,10 @@ import DefaultContext from '../../src/React/DefaultContext';
 import {Inject, Provide, Injector as InjectorConstructor} from 'di-ts';
 import {Injector} from 'di';
 import * as React from 'react';
+import IReactDOMServer = require('react-dom/server');
 import {PropTypes, Component} from 'react';
+// TODO react-dom definition is writen bad. Should be static
+var ReactDOMServer: IReactDOMServer = require('react-dom/server');
 
 describe('React.DefaultContext', () => {
 	class Rider {
@@ -51,7 +54,7 @@ describe('React.DefaultContext', () => {
 		}
 
 		var app = React.createElement(App, { injector: injector });
-		var body = React.renderToStaticMarkup(app);
+		var body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Michael</div>');
 	});
 
@@ -114,7 +117,7 @@ describe('React.DefaultContext', () => {
 		}
 
 		var app = React.createElement(App, { injector: injector });
-		var body = React.renderToStaticMarkup(app);
+		var body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Daniel</div>');
 	});
 
@@ -176,7 +179,7 @@ describe('React.DefaultContext', () => {
 		}
 
 		var app = React.createElement(App, { injector: injector });
-		var body = React.renderToStaticMarkup(app);
+		var body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Alfred</div>');
 	});
 
@@ -241,7 +244,7 @@ describe('React.DefaultContext', () => {
 		}
 
 		var app = React.createElement(App, { injector: injector });
-		var body = React.renderToStaticMarkup(app);
+		var body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Stop - <div>Michael</div></div>');
 	});
 
@@ -321,7 +324,7 @@ describe('React.DefaultContext', () => {
 		}
 
 		var app = React.createElement(App, { injector: injector });
-		var body = React.renderToStaticMarkup(app);
+		var body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Michael is not <div>Alonzo</div></div>');
 	});
 });
