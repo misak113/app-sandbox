@@ -34,11 +34,14 @@ export default class Server extends Component<IServerProps, IServerState, {}> {
 		};
 	}
 
-	render() {
+	componentWillMount() {
 		var app = this.state.expressServer.App;
 		app.use(serveStatic(__dirname + '/../../../dist'));
 		var port = process.env.PORT || 80;
 		app.listen(port, () => console.info('Listen on port ' + port));
+	}
+
+	render() {
 		return (
 			<Router/>
 		);

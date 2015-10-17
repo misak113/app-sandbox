@@ -29,38 +29,67 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		};
 	}
 
-	private handler(request: Request, response: Response, next: () => void) {
+	private middleware() {
+		return (request: Request, response: Response, next: () => void) => this.handle(request, response, next);
+	}
+
+	private handle(request: Request, response: Response, next: () => void) {
 		var startTime = process.hrtime();
 		match({
 			routes,
 			location: request.url
-		}, (error: Error, redirectLocation, renderProps) => {
-			if (error) {
-				response.status(500)
-					.send(error.message);
-			} else if (redirectLocation) {
-				response.status(302)
-					.redirect(redirectLocation.pathname + redirectLocation.search);
-			} else if (renderProps) {
-				var totalTime = process.hrtime(startTime);
-				var body = renderToString(<RoutingContext {...renderProps} injector={this.context.injector} />);
-				var header = {
-					"Content-Length": body.length,
-					"Content-Type": "text/html",
-					"X-Render-Time": Math.round(totalTime[0] * 1E3 + totalTime[1] / 1E6 * 1E2) / 1E2 + " ms"
-				};
-				response.status(200)
-					.header(header).send(this.state.doctype + body);
-			} else {
-				response.status(404).send('Not found');
-			}
-		});
+		}, (error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps) => this.match(error, redirectLocation, renderProps, response, startTime));
+	}
+
+	private match(error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps, response: Response, startTime: number[]) {
+		if (error) {
+			response.status(500)
+				.send(error.message);
+		} else if (redirectLocation) {
+			response.status(302)
+				.redirect(redirectLocation.pathname + redirectLocation.search);
+		} else if (renderProps) {
+			var totalTime = process.hrtime(startTime);
+			var body = renderToString(<RoutingContext {...renderProps} injector={this.context.injector} />);
+			response.status(200)
+				.header(this.getHeader(body, totalTime))
+				.send(this.state.doctype + body);
+		} else {
+			response.status(404).send('Not found');
+		}
+	}
+
+	private getHeader(body: string, totalTime: number[]) {
+		return {
+			"Content-Length": body.length,
+			"Content-Type": "text/html",
+			"X-Render-Time": this.getMiliseconds(totalTime) + " ms"
+		};
+	}
+
+	private getMiliseconds(time: number[]) {
+		return Math.round(time[0] * 1E3 + time[1] / 1E6 * 1E2) / 1E2;
+	}
+
+	componentWillMount() {
+		this.context.expressServer.App.use(this.middleware());
 	}
 
 	render() {
-		this.context.expressServer.App.use(
-			(request: Request, response: Response, next: () => void) => this.handler(request, response, next)
-		);
 		return null;
 	}
+}
+
+interface IRedirectLocation {
+	pathname: string;
+	search: string;
+}
+
+interface IRenderProps {
+	history: any;
+	createElement<P>(component: Component<any, any, any>, props: P): React.ReactElement<P>;
+	location: Location;
+	routes: any[];
+	params: any;
+	components: Component<any, any, any>[];
 }
