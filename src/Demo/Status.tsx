@@ -5,11 +5,15 @@ import Component from '../React/Component';
 import DefaultContext from '../React/DefaultContext';
 import Dispatcher from '../Flux/Dispatcher';
 import ActionBinding from '../Flux/ActionBinding';
+import StatusStore from './StatusStore';
+import StatusActionCreator, {StatusActionName} from './StatusActionCreator';
 
 @Inject
 export class StatusContext {
 	constructor(
-		public dispatcher: Dispatcher
+		public dispatcher: Dispatcher,
+		public statusActionCreator: StatusActionCreator,
+		public statusStore: StatusStore
 	) { }
 }
 
@@ -18,15 +22,17 @@ export default class Status extends Component<{}, { status?: boolean }, StatusCo
 
 	private changeStatusBinding: ActionBinding;
 
-	constructor(props, context) {
+	constructor(props: {}, context: StatusContext) {
 		super(props, context);
-		this.state = {
-			status: false
-		};
+		this.state = {};
 	}
 
 	componentDidMount() {
-		this.changeStatusBinding = this.context.dispatcher.bind('changeStatus', () => this.setState({ status: !this.state.status }));
+		this.changeStatusBinding = this.context.dispatcher.bind(
+			this.context.statusActionCreator.createActionName(StatusActionName.STATUS_CHANGED), () => this.setState({
+				status: this.context.statusStore.Status
+			})
+		);
 	}
 
 	componentWillUnmount() {
