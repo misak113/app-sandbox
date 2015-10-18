@@ -1,12 +1,13 @@
 
-export class InjectorMissingException extends Error {
+export class FluxDispatcherUnbindException extends Error {
 
 	public name: string;
 
 	constructor(
-		public message: string = null
+		public message: string = null,
+		public data?: any
 	) {
 		super(message);
-		this.name = 'InjectorMissingException';
+		this.name = 'FluxDispatcherUnbindException';
 	}
 }

@@ -30,7 +30,7 @@ export default class Dispatcher {
 	unbind(actionBinding: ActionBinding) {
 		actionBinding.ActionNames.forEach((actionName: string) => {
 			if (this.eventEmitter.listeners(actionName).indexOf(actionBinding.ActionCallback) === -1) {
-				throw new FluxDispatcherUnbindException('Try to unbind not binded ActionBindind', actionBinding);
+				throw new FluxDispatcherUnbindException('Try to unbind not binded ActionBinding', actionBinding);
 			}
 			this.eventEmitter.removeListener(actionName, actionBinding.ActionCallback);
 		});

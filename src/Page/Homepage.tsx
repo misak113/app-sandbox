@@ -3,42 +3,47 @@ import * as React from 'react';
 import {Inject} from 'di-ts';
 import Component from '../React/Component';
 import DefaultContext from '../React/DefaultContext';
-import DateFactory from '../DateTime/DateFactory';
+import Dispatcher from '../Flux/Dispatcher';
+import Action from '../Flux/Action';
+import ActionBinding from '../Flux/ActionBinding';
 
 @Inject
 export class HomepageContext {
 	constructor(
-		public dateFactory: DateFactory
+		public dispatcher: Dispatcher
 	) { }
 }
 
 @DefaultContext(HomepageContext)
-export default class Homepage extends Component<{}, { nowHumanized?: string }, HomepageContext> {
+export default class Homepage extends Component<{}, { status?: boolean }, HomepageContext> {
 
-	private nowInterval: NodeJS.Timer;
+	private changeStatusBinding: ActionBinding;
 
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			nowHumanized: this.getHumanizedTime()
+			status: false
 		};
 	}
 
+	toggleStatus() {
+		this.context.dispatcher.dispatch(new Action('changeStatus'));
+	}
+
 	componentDidMount() {
-		this.nowInterval = setInterval(() => this.setState({
-			nowHumanized: this.getHumanizedTime()
-		}), 1000);
+		this.changeStatusBinding = this.context.dispatcher.bind('changeStatus', () => this.setState({ status: !this.state.status }));
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.nowInterval);
-	}
-
-	private getHumanizedTime() {
-		return this.context.dateFactory.now().toString();
+		this.context.dispatcher.unbind(this.changeStatusBinding);
 	}
 
 	render() {
-		return <div>{this.state.nowHumanized}</div>;
+		return (
+			<div>
+				{this.state.status ? 'ON' : 'OFF'}
+				<button onClick={() => this.toggleStatus()}>Toogle</button>
+			</div>
+		);
 	}
 }
