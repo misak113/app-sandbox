@@ -38,10 +38,21 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		match({
 			routes,
 			location: request.url
-		}, (error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps) => this.match(error, redirectLocation, renderProps, response, startTime));
+		}, (
+			error: Error,
+			redirectLocation: IRedirectLocation,
+			renderProps: IRenderProps
+		) => this.match(error, redirectLocation, renderProps, response, startTime, next));
 	}
 
-	private match(error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps, response: Response, startTime: number[]) {
+	private match(
+		error: Error,
+		redirectLocation: IRedirectLocation,
+		renderProps: IRenderProps,
+		response: Response,
+		startTime: number[],
+		next: () => void
+	) {
 		if (error) {
 			response.status(500)
 				.send(error.message);
@@ -55,7 +66,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 				.header(this.getHeader(body, totalTime))
 				.send(this.state.doctype + body);
 		} else {
-			response.status(404).send('Not found');
+			next();
 		}
 	}
 
@@ -80,6 +91,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 	}
 }
 
+// TODO move to react-router.d.ts
 interface IRedirectLocation {
 	pathname: string;
 	search: string;
