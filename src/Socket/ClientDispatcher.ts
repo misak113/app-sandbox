@@ -16,12 +16,21 @@ export default class ClientDispatcher {
 
 	listen() {
 		var socket = this.socket.getSocketOf(this.namespace.value);
+		socket.on('connect', () => this.bind(socket));
+	}
+
+	private bind(socket: SocketIOClient.Socket) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload);
+			var action = new Action(name, payload, 'server');
 			this.dispatcher.dispatch(action);
 		});
-		this.dispatcher.bind('*', (action: Action) => {
-			socket.emit('action', action.Name, action.Payload);
+		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
+			if (action.Source !== 'server') {
+				socket.emit('action', action.Name, action.Payload);
+			}
+		});
+		socket.on('disconnect', () => {
+			this.dispatcher.unbind(actionBinding);
 		});
 	}
 }

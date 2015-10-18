@@ -15,13 +15,22 @@ export default class ServerDispatcher {
 	) {}
 
 	listen() {
-		var socket = this.socket.Socket.of(this.namespace.value);
+		var namespace = this.socket.Socket.of(this.namespace.value);
+		namespace.on('connect', (socket: SocketIO.Socket) => this.bind(socket));
+	}
+
+	private bind(socket: SocketIO.Socket) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload);
+			var action = new Action(name, payload, 'client');
 			this.dispatcher.dispatch(action);
 		});
-		this.dispatcher.bind('*', (action: Action) => {
-			socket.emit('action', action.Name, action.Payload);
+		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
+			if (action.Source !== 'client') {
+				socket.emit('action', action.Name, action.Payload);
+			}
+		});
+		socket.on('disconnect', () => {
+			this.dispatcher.unbind(actionBinding);
 		});
 	}
 }
