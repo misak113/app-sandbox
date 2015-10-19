@@ -32,5 +32,6 @@ export default class ServerDispatcher {
 		socket.on('disconnect', () => {
 			this.dispatcher.unbind(actionBinding);
 		});
+		socket.on('error', (error: Error) => console.error(error));
 	}
 }
