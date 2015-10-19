@@ -27,7 +27,7 @@
     "moment": "^2.10.6",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
-    "react-router": "^1.0.0-rc3",
+    "react-router": "git+https://github.com/misak113/react-router.git#v1.0.0-rc3-1",
     "reflect-metadata": "^0.1.2",
     "serve-static": "^1.10.0",
     "socket.io": "^1.3.7",
