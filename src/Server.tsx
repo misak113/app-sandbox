@@ -9,6 +9,7 @@ import * as serveStatic from 'serve-static';
 import ExpressServer from './Http/ExpressServer';
 import HttpServer from './Http/HttpServer';
 import ServerOptions from './Http/ServerOptions';
+import stores from './config/stores';
 
 export interface IServerProps {
 	injector: Injector;
@@ -45,6 +46,7 @@ export default class Server extends Component<IServerProps, IServerState, {}> {
 
 	componentWillMount() {
 		this.state.serverDispatcher.listen();
+		stores.forEach((store: any) => this.props.injector.get(store));
 		var app = this.state.expressServer.App;
 		app.use(serveStatic(__dirname + '/../../../dist'));
 		var port = this.state.serverOptions.port;

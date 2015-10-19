@@ -15,13 +15,8 @@ export default class StatusActionCreator extends ActionCreator<StatusActionName>
 	changeStatus() {
 		return this.createAction(StatusActionName.CHANGE_STATUS);
 	}
-
-	statusChanged() {
-		return this.createAction(StatusActionName.STATUS_CHANGED);
-	}
 }
 
 export enum StatusActionName {
-	CHANGE_STATUS,
-	STATUS_CHANGED
+	CHANGE_STATUS
 }

@@ -2,6 +2,8 @@
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
 import StatusActionCreator, {StatusActionName} from './StatusActionCreator';
+import ClientStateActionCreator from '../Router/ClientStateActionCreator';
+import IClientState from '../Router/IClientState';
 
 @Inject
 export default class StatusStore {
@@ -12,11 +14,19 @@ export default class StatusStore {
 
 	constructor(
 		private dispatcher: Dispatcher,
-		private actionCreater: StatusActionCreator
+		private statusActionCreater: StatusActionCreator,
+		private clientStateActionCreator: ClientStateActionCreator
 	) {
-		this.dispatcher.bind(this.actionCreater.createActionName(StatusActionName.CHANGE_STATUS), () => {
+		this.dispatcher.bind(this.statusActionCreater.createActionName(StatusActionName.CHANGE_STATUS), () => {
 			this.status = !this.status;
-			this.dispatcher.dispatch(this.actionCreater.statusChanged());
+			this.update();
 		});
+	}
+
+	private update() {
+		this.dispatcher.dispatch(this.clientStateActionCreator.update((renderProps: IClientState) => {
+			renderProps = renderProps.setIn(['status'], this.status);
+			return renderProps;
+		}));
 	}
 }
