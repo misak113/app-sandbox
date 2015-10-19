@@ -7,6 +7,7 @@ import {Inject} from 'di-ts';
 import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
+import ClientStateStore from './ClientStateStore';
 import routes from '../config/routes';
 import services from '../config/services';
 var match = require('react-router').match;
@@ -15,7 +16,8 @@ var renderToString = require('react-dom/server').renderToString;
 @Inject
 export class RouterContext {
 	constructor(
-		public expressServer: ExpressServer
+		public expressServer: ExpressServer,
+		public clientStateStore: ClientStateStore
 	) {}
 }
 
@@ -62,7 +64,11 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		} else if (renderProps) {
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
-			var body = renderToString(<RoutingContext {...renderProps} injector={injector} />);
+			var body = renderToString(
+				<RoutingContext
+					{...renderProps}
+					injector={injector}
+					componentProps={{ clientState: this.context.clientStateStore.ClientState }}/>);
 			response.status(200)
 				.header(this.getHeader(body, totalTime))
 				.send(this.state.doctype + body);

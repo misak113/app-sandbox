@@ -7,6 +7,7 @@ var ReactRouterRoutingContext = require('react-router').RoutingContext;
 
 export interface IRoutingContextProps {
 	injector: Injector;
+	[name: string]: any;
 }
 
 export interface IRoutingContextChildContext {
