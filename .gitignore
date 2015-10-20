@@ -6,6 +6,7 @@ typings/*
 
 .idea/
 *.sublime-workspace
+*.sublime-project
 
 Thumbs.db
 ehthumbs.db
