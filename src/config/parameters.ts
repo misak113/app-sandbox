@@ -1,14 +1,14 @@
 
 import {Provide} from 'di-ts';
-import DispatcherNamespace from '../Socket/DispatcherNamespace'
-import ServerOptions from '../Http/ServerOptions'
-import HostOptions from '../Http/HostOptions'
+import DispatcherNamespace from '../Socket/DispatcherNamespace';
+import ServerOptions from '../Http/ServerOptions';
+import HostOptions from '../Http/HostOptions';
 
 @Provide(DispatcherNamespace)
 export class SocketDispatcherNamespace extends DispatcherNamespace {
 	constructor() {
 		super();
-		this.value = '/dispatcher'
+		this.value = '/dispatcher';
 	}
 }
 
@@ -20,7 +20,6 @@ export class HttpServerOptions extends ServerOptions {
 		this.port = process.env.PORT || 80;
 	}
 }
-
 
 @Provide(HostOptions)
 export class HttpHostOptions extends HostOptions {

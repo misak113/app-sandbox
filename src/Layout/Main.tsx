@@ -8,13 +8,13 @@ export default class Main extends Component<{ children: any[] }, {}, {}> {
 		return (
 			<html>
 				<head>
-					<meta charSet="utf-8"/>
+					<meta charSet='utf-8'/>
 					<title>App sandbox</title>
-					<link rel="stylesheet" media="all" href="/css/index.css"></link>
+					<link rel='stylesheet' media='all' href='/css/index.css'></link>
 				</head>
 				<body>
 					{this.props.children}
-					<script src="/front-bundle.js"></script>
+					<script src='/front-bundle.js'></script>
 				</body>
 			</html>
 		);

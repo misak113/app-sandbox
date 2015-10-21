@@ -9,7 +9,7 @@ import {Map} from 'immutable';
 
 @Inject
 export default class ClientStateStore {
-	
+
 	private clientState: IClientState;
 
 	get ClientState() { return this.clientState; }

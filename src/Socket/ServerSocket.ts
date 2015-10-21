@@ -9,7 +9,7 @@ export default class ServerSocket {
 	private socket: SocketIO.Server;
 
 	get Socket() { return this.socket; }
-	
+
 	constructor(
 		httpServer: HttpServer
 	) {

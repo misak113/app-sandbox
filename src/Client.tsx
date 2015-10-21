@@ -9,9 +9,11 @@ import ClientStateActionCreator, {ClientStateActionName} from './Router/ClientSt
 import {Injector} from 'di';
 import {Map, fromJS} from 'immutable';
 import routes from './config/routes';
+/* tslint:disable */
 var Router = require('react-router').Router;
 var history = require('history');
 var patch = require('immutablepatch');
+/* tslint:enable */
 
 export interface IClientProps {
 	injector: Injector;
@@ -55,7 +57,7 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 			this.setState({ clientState: nextClientState });
 		});
 	}
-	
+
 	render() {
 		return (
 			<Router

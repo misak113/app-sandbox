@@ -6,7 +6,7 @@ abstract class ActionCreator<ActionName extends ActionNameStatic<any>> {
 
 	protected abstract getActionName(): ActionNameStatic<ActionName>;
 	protected abstract getName(): string;
-	
+
 	protected createAction(actionName: ActionName, payload?: any) {
 		return new Action(this.createActionName(actionName), payload);
 	}

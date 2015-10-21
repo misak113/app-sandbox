@@ -11,7 +11,7 @@ export default class Dispatcher {
 	constructor() {
 		this.eventEmitter = new EventEmitter();
 	}
-	
+
 	dispatch(action: Action) {
 		this.eventEmitter.emit(action.Name, action);
 		this.eventEmitter.emit('*', action);

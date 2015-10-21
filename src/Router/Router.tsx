@@ -10,8 +10,10 @@ import ExpressServer from '../Http/ExpressServer';
 import ClientStateStore from './ClientStateStore';
 import routes from '../config/routes';
 import services from '../config/services';
+/* tslint:disable */
 var match = require('react-router').match;
 var renderToString = require('react-dom/server').renderToString;
+/* tslint:enable */
 
 @Inject
 export class RouterContext {
@@ -24,7 +26,7 @@ export class RouterContext {
 @DefaultContext(RouterContext)
 export default class Router extends Component<{ doctype?: string }, { doctype?: string }, RouterContext> {
 
-	constructor(props, context) {
+	constructor(props: { doctype?: string }, context: RouterContext) {
 		super(props, context);
 		this.state = {
 			doctype: props.doctype || '<!doctype html>'
@@ -37,14 +39,13 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 
 	private handle(request: Request, response: Response, next: () => void) {
 		var startTime = process.hrtime();
-		match({
-			routes,
+		var options = {
+			routes: routes,
 			location: request.url
-		}, (
-			error: Error,
-			redirectLocation: IRedirectLocation,
-			renderProps: IRenderProps
-		) => this.match(error, redirectLocation, renderProps, response, startTime, next));
+		};
+		match(options, (error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps) => this.match(
+			error, redirectLocation, renderProps, response, startTime, next
+		));
 	}
 
 	private match(
@@ -79,9 +80,9 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 
 	private getHeader(body: string, totalTime: number[]) {
 		return {
-			"Content-Length": body.length,
-			"Content-Type": "text/html",
-			"X-Render-Time": this.getMiliseconds(totalTime) + " ms"
+			'Content-Length': body.length,
+			'Content-Type': 'text/html',
+			'X-Render-Time': this.getMiliseconds(totalTime) + ' ms'
 		};
 	}
 

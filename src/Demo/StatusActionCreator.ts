@@ -12,7 +12,7 @@ export default class StatusActionCreator extends ActionCreator<StatusActionName>
 		return 'Demo.Status';
 	}
 
-	changeStatus() {
+	changeStatus(): Action {
 		return this.createAction(StatusActionName.CHANGE_STATUS);
 	}
 }
