@@ -9,6 +9,7 @@ import ClientStateActionCreator, {ClientStateActionName} from './ClientState/Cli
 import IClientStateClientState from './ClientState/IClientState';
 import {Injector} from 'di';
 import {fromJS} from 'immutable';
+import {parse as parseCookies} from 'cookie';
 import routes from './config/routes';
 /* tslint:disable */
 var Router = require('react-router').Router;
@@ -18,7 +19,6 @@ var patch = require('immutablepatch');
 
 declare namespace window {
 	export var clientState: any;
-	export var clientId: string;
 }
 
 export interface IClientProps {
@@ -42,6 +42,7 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 
 	constructor(props: IClientProps, context: {}) {
 		super(props, context);
+		var cookies = parseCookies(document.cookie) as any as { clientId: string; };
 		this.state = {
 			history: history.createHistory({}),
 			clientDispatcher: this.props.injector.get(ClientDispatcher),
@@ -49,7 +50,7 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 			clientStateActionCreator: this.props.injector.get(ClientStateActionCreator),
 			// from global context added in Router.tsx
 			clientState: fromJS(window.clientState),
-			clientId: window.clientId
+			clientId: cookies.clientId
 		};
 	}
 

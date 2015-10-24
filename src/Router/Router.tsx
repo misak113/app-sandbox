@@ -47,7 +47,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 			location: request.url
 		};
 		match(options, (error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps) => this.match(
-			error, redirectLocation, renderProps, response, startTime, next
+			error, redirectLocation, renderProps, request, response, startTime, next
 		));
 	}
 
@@ -55,6 +55,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		error: Error,
 		redirectLocation: IRedirectLocation,
 		renderProps: IRenderProps,
+		request: Request,
 		response: Response,
 		startTime: number[],
 		next: () => void
@@ -68,13 +69,21 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		} else if (renderProps) {
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
-			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.create((clientState: IClientState, clientId: string) => {
+			var clientId = request.cookies.clientId;
+			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.getOrCreate(clientId, (
+				clientState: IClientState,
+				createdClientId: string
+			) => {
+				if (createdClientId !== clientId) {
+					clientId = createdClientId;
+					response.cookie('clientId', clientId);
+				}
 				var body = renderToString(
 					<RoutingContext
 						{...renderProps}
 						injector={injector}
 						componentProps={{ clientState: clientState, clientId: clientId }}/>);
-				var initialScript = this.getInitialScript(clientId, clientState);
+				var initialScript = this.getInitialScript(clientState);
 				response.status(200)
 					.header(this.getHeader(body, totalTime, clientId))
 					.send(this.state.doctype + initialScript + body);
@@ -84,10 +93,9 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		}
 	}
 
-	private getInitialScript(clientId: string, clientState: IClientState) {
+	private getInitialScript(clientState: IClientState) {
 		var clientStateJson = JSON.stringify(clientState.toJS());
 		return `<script>
-			var clientId = ` + JSON.stringify(clientId) + `;
 			var clientState = ` + clientStateJson + `;
 		</script>`;
 	}

@@ -17,6 +17,8 @@
   "license": "ISC",
   "homepage": "https://github.com/misak113/app-sandbox#readme",
   "dependencies": {
+    "cookie": "^0.2.2",
+    "cookie-parser": "^1.4.0",
     "di": "^2.0.0-pre-14",
     "di-ts": "0.0.30",
     "express": "^4.13.3",

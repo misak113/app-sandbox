@@ -23,7 +23,7 @@ export default class ClientStateStore {
 			this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE), (action: Action) => this.update(action)
 		);
 		this.dispatcher.bind(
-			this.clientStateActionCreater.createActionName(ClientStateActionName.CREATE), (action: Action) => this.create(action)
+			this.clientStateActionCreater.createActionName(ClientStateActionName.GET_OR_CREATE), (action: Action) => this.getOrCreate(action)
 		);
 	}
 
@@ -57,13 +57,23 @@ export default class ClientStateStore {
 		}
 	}
 
-	private create(action: Action) {
-		if (typeof action.Payload !== 'function') {
+	private getOrCreate(action: Action) {
+		var clientId = action.Payload.clientId;
+		var successCallback = action.Payload.successCallback;
+		if (typeof successCallback !== 'function') {
 			throw new CreateClientStateException('Create action of clientState needs to have created callback as payload');
 		}
-		var clientId = '' + Math.random();
-		var clientState = Map({});
-		this.clientStateMap = this.clientStateMap.set(clientId, clientState);
-		action.Payload(clientState, clientId);
+		if (this.clientStateMap.has(clientId)) {
+			var clientState = this.clientStateMap.get(clientId);
+		} else {
+			clientId = this.generateClientId();
+			var clientState = Map({});
+			this.clientStateMap = this.clientStateMap.set(clientId, clientState);
+		}
+		successCallback(clientState, clientId);
+	}
+
+	private generateClientId() {
+		return '' + Math.random();
 	}
 }
