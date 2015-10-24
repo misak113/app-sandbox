@@ -4,7 +4,7 @@ import ClientSocket from './ClientSocket';
 import Action from '../Flux/Action';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
-import ServerSource from './Source/ServerSource';
+import ServerSource from '../Addressing/ServerSource';
 
 @Inject
 export default class ClientDispatcher {

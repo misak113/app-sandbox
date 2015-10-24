@@ -4,7 +4,8 @@ import ServerSocket from './ServerSocket';
 import Action from '../Flux/Action';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
-import ClientSource from './Source/ClientSource';
+import ClientSource from '../Addressing/ClientSource';
+import ClientTarget from '../Addressing/ClientTarget';
 
 @Inject
 export default class ServerDispatcher {
@@ -28,7 +29,7 @@ export default class ServerDispatcher {
 			this.dispatcher.dispatch(action);
 		});
 		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
-			if (!(action.Source instanceof ClientSource)) {
+			if (!(action.Source instanceof ClientSource) && this.isTarget(action.Target, clientId)) {
 				socket.emit('action', action.Name, action.Payload);
 			}
 		});
@@ -36,5 +37,15 @@ export default class ServerDispatcher {
 			this.dispatcher.unbind(actionBinding);
 		});
 		socket.on('error', (error: Error) => console.error(error));
+	}
+
+	private isTarget(target: any, clientId: string) {
+		if (!target) {
+			return true;
+		}
+		if (target instanceof ClientTarget && target.Id === clientId) {
+			return true;
+		}
+		return false;
 	}
 }

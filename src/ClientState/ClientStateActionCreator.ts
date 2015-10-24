@@ -2,6 +2,7 @@
 import Action from '../Flux/Action';
 import ActionCreator from '../Flux/ActionCreator';
 import IClientState from './IClientState';
+import ClientTarget from '../Addressing/ClientTarget';
 /* tslint:disable */
 var diff = require('immutablediff');
 /* tslint:enable */
@@ -16,7 +17,7 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 		return 'Router.ClientState';
 	}
 
-	update(updateCallback: (clientState: IClientState) => IClientState): Action {
+	update(updateCallback: (clientState: IClientState, clientId: string) => IClientState): Action {
 		return this.createAction(ClientStateActionName.UPDATE, updateCallback);
 	}
 
@@ -24,9 +25,9 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 		return this.createAction(ClientStateActionName.CREATE, createdCallback);
 	}
 
-	sendDiff(originalState: IClientState, nextState: IClientState): Action {
+	sendDiff(originalState: IClientState, nextState: IClientState, clientId: string): Action {
 		var ops = diff(originalState, nextState);
-		return this.createAction(ClientStateActionName.SEND_DIFF, ops.toJS());
+		return this.createAction(ClientStateActionName.SEND_DIFF, ops.toJS(), new ClientTarget(clientId));
 	}
 }
 

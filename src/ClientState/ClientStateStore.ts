@@ -38,7 +38,7 @@ export default class ClientStateStore {
 		var originalClientStateMap = this.clientStateMap;
 		var nextClientStateMap = originalClientStateMap.reduce(
 			(clientStateMap: Map<string, IClientState>, originalClientState: IClientState, clientId: string) => {
-				var nextClientState = action.Payload(originalClientState);
+				var nextClientState = action.Payload(originalClientState, clientId);
 				if (nextClientState !== originalClientState) {
 					clientStateMap = clientStateMap.set(clientId, nextClientState);
 				}
@@ -51,7 +51,7 @@ export default class ClientStateStore {
 			nextClientStateMap.forEach((nextClientState: IClientState, clientId: string) => {
 				var originalClientState = originalClientStateMap.get(clientId);
 				if (nextClientState !== originalClientState) {
-					this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState));
+					this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState, clientId));
 				}
 			});
 		}
