@@ -5,7 +5,7 @@ import Component from './React/Component';
 import ClientDispatcher from './Socket/ClientDispatcher';
 import Dispatcher from './Flux/Dispatcher';
 import Action from './Flux/Action';
-import ClientStateActionCreator, {ClientStateActionName} from './Router/ClientStateActionCreator';
+import ClientStateActionCreator, {ClientStateActionName} from './ClientState/ClientStateActionCreator';
 import {Injector} from 'di';
 import {Map, fromJS} from 'immutable';
 import routes from './config/routes';

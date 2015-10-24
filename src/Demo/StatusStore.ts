@@ -2,8 +2,8 @@
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
 import StatusActionCreator, {StatusActionName} from './StatusActionCreator';
-import ClientStateActionCreator from '../Router/ClientStateActionCreator';
-import IClientState from '../Router/IClientState';
+import ClientStateActionCreator from '../ClientState/ClientStateActionCreator';
+import IClientState from '../ClientState/IClientState';
 
 @Inject
 export default class StatusStore {

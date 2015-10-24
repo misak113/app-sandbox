@@ -3,7 +3,7 @@ import * as React from 'react';
 import Component from '../React/Component';
 import Status from './Status';
 import ToggleButton from './ToggleButton';
-import IClientState from '../Router/IClientState';
+import IClientState from '../ClientState/IClientState';
 
 export interface IHomepageProps {
 	clientState: IClientState;

@@ -7,7 +7,7 @@ import {Inject} from 'di-ts';
 import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
-import ClientStateStore from './ClientStateStore';
+import ClientStateStore from '../ClientState/ClientStateStore';
 import routes from '../config/routes';
 import services from '../config/services';
 /* tslint:disable */
