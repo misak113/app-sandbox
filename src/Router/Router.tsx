@@ -74,20 +74,30 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 						{...renderProps}
 						injector={injector}
 						componentProps={{ clientState: clientState, clientId: clientId }}/>);
+				var initialScript = this.getInitialScript(clientId, clientState);
 				response.status(200)
-					.header(this.getHeader(body, totalTime))
-					.send(this.state.doctype + body);
+					.header(this.getHeader(body, totalTime, clientId))
+					.send(this.state.doctype + initialScript + body);
 			}));
 		} else {
 			next();
 		}
 	}
 
-	private getHeader(body: string, totalTime: number[]) {
+	private getInitialScript(clientId: string, clientState: IClientState) {
+		var clientStateJson = JSON.stringify(clientState.toJS());
+		return `<script>
+			var clientId = ` + JSON.stringify(clientId) + `;
+			var clientState = ` + clientStateJson + `;
+		</script>`;
+	}
+
+	private getHeader(body: string, totalTime: number[], clientId: string) {
 		return {
 			'Content-Length': body.length,
 			'Content-Type': 'text/html',
-			'X-Render-Time': this.getMiliseconds(totalTime) + ' ms'
+			'X-Render-Time': this.getMiliseconds(totalTime) + ' ms',
+			'X-Client-Id': clientId
 		};
 	}
 

@@ -6,14 +6,20 @@ import ClientDispatcher from './Socket/ClientDispatcher';
 import Dispatcher from './Flux/Dispatcher';
 import Action from './Flux/Action';
 import ClientStateActionCreator, {ClientStateActionName} from './ClientState/ClientStateActionCreator';
+import IClientStateClientState from './ClientState/IClientState';
 import {Injector} from 'di';
-import {Map, fromJS} from 'immutable';
+import {fromJS} from 'immutable';
 import routes from './config/routes';
 /* tslint:disable */
 var Router = require('react-router').Router;
 var history = require('history');
 var patch = require('immutablepatch');
 /* tslint:enable */
+
+declare namespace window {
+	export var clientState: any;
+	export var clientId: string;
+}
 
 export interface IClientProps {
 	injector: Injector;
@@ -24,7 +30,8 @@ export interface IClientState {
 	clientDispatcher?: ClientDispatcher;
 	dispatcher?: Dispatcher;
 	clientStateActionCreator?: ClientStateActionCreator;
-	clientState?: Map<string, any>;
+	clientState?: IClientStateClientState;
+	clientId?: string;
 }
 
 export default class Client extends Component<IClientProps, IClientState, {}> {
@@ -40,7 +47,9 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 			clientDispatcher: this.props.injector.get(ClientDispatcher),
 			dispatcher: this.props.injector.get(Dispatcher),
 			clientStateActionCreator: this.props.injector.get(ClientStateActionCreator),
-			clientState: Map({})
+			// from global context added in Router.tsx
+			clientState: fromJS(window.clientState),
+			clientId: window.clientId
 		};
 	}
 
@@ -51,7 +60,7 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 	}
 
 	componentWillMount() {
-		this.state.clientDispatcher.listen();
+		this.state.clientDispatcher.listen(this.state.clientId);
 		this.state.dispatcher.bind(this.state.clientStateActionCreator.createActionName(ClientStateActionName.SEND_DIFF), (action: Action) => {
 			var nextClientState = patch(this.state.clientState, fromJS(action.Payload));
 			this.setState({ clientState: nextClientState });
@@ -63,7 +72,7 @@ export default class Client extends Component<IClientProps, IClientState, {}> {
 			<Router
 				routes={routes}
 				history={this.state.history}
-				componentProps={{ clientState: this.state.clientState }}/>
+				componentProps={{ clientState: this.state.clientState, clientId: this.state.clientId }}/>
 		);
 	}
 }

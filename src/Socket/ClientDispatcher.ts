@@ -4,6 +4,7 @@ import ClientSocket from './ClientSocket';
 import Action from '../Flux/Action';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
+import ServerSource from './Source/ServerSource';
 
 @Inject
 export default class ClientDispatcher {
@@ -14,18 +15,21 @@ export default class ClientDispatcher {
 		private dispatcher: Dispatcher
 	) {}
 
-	listen() {
+	listen(clientId: string) {
 		var socket = this.socket.getSocketOf(this.namespace.value);
-		socket.on('connect', () => this.bind(socket));
+		socket.on('connect', () => {
+			socket.emit('clientId', clientId);
+			this.bind(socket);
+		});
 	}
 
 	private bind(socket: SocketIOClient.Socket) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload, 'server');
+			var action = new Action(name, payload, new ServerSource());
 			this.dispatcher.dispatch(action);
 		});
 		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
-			if (action.Source !== 'server') {
+			if (!(action.Source instanceof ServerSource)) {
 				socket.emit('action', action.Name, action.Payload);
 			}
 		});
