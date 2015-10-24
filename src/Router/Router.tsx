@@ -7,7 +7,9 @@ import {Inject} from 'di-ts';
 import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
-import ClientStateStore from '../ClientState/ClientStateStore';
+import IClientState from '../ClientState/IClientState';
+import ClientStateActionCreator from '../ClientState/ClientStateActionCreator';
+import Dispatcher from '../Flux/Dispatcher';
 import routes from '../config/routes';
 import services from '../config/services';
 /* tslint:disable */
@@ -19,7 +21,8 @@ var renderToString = require('react-dom/server').renderToString;
 export class RouterContext {
 	constructor(
 		public expressServer: ExpressServer,
-		public clientStateStore: ClientStateStore
+		public clientStateActionCreator: ClientStateActionCreator,
+		public dispatcher: Dispatcher
 	) {}
 }
 
@@ -65,14 +68,16 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		} else if (renderProps) {
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
-			var body = renderToString(
-				<RoutingContext
-					{...renderProps}
-					injector={injector}
-					componentProps={{ clientState: this.context.clientStateStore.ClientState }}/>);
-			response.status(200)
-				.header(this.getHeader(body, totalTime))
-				.send(this.state.doctype + body);
+			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.create((clientState: IClientState, clientId: string) => {
+				var body = renderToString(
+					<RoutingContext
+						{...renderProps}
+						injector={injector}
+						componentProps={{ clientState: clientState, clientId: clientId }}/>);
+				response.status(200)
+					.header(this.getHeader(body, totalTime))
+					.send(this.state.doctype + body);
+			}));
 		} else {
 			next();
 		}

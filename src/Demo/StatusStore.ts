@@ -24,9 +24,9 @@ export default class StatusStore {
 	}
 
 	private update() {
-		this.dispatcher.dispatch(this.clientStateActionCreator.update((renderProps: IClientState) => {
-			renderProps = renderProps.setIn(['status'], this.status);
-			return renderProps;
+		this.dispatcher.dispatch(this.clientStateActionCreator.update((clientState: IClientState) => {
+			clientState = clientState.setIn(['status'], this.status);
+			return clientState;
 		}));
 	}
 }

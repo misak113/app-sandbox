@@ -10,22 +10,60 @@ import {Map} from 'immutable';
 @Inject
 export default class ClientStateStore {
 
-	private clientState: IClientState;
+	private clientStateMap: Map<string, IClientState>;
 
-	get ClientState() { return this.clientState; }
+	get Map() { return this.clientStateMap; }
 
 	constructor(
 		private dispatcher: Dispatcher,
 		private clientStateActionCreater: ClientStateActionCreator
 	) {
-		this.clientState = Map({});
-		this.dispatcher.bind(this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE), (action: Action) => {
-			if (typeof action.Payload !== 'function') {
-				throw new UpdateClientStateException('Update action of render props needs to have update callback as payload');
-			}
-			var originalClientState = this.clientState;
-			this.clientState = action.Payload(this.clientState);
-			this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, this.clientState));
-		});
+		this.clientStateMap = Map({});
+		this.dispatcher.bind(
+			this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE), (action: Action) => this.update(action)
+		);
+		this.dispatcher.bind(
+			this.clientStateActionCreater.createActionName(ClientStateActionName.CREATE), (action: Action) => this.create(action)
+		);
+	}
+
+	getById(clientId: string) {
+		return this.clientStateMap.get(clientId);
+	}
+
+	private update(action: Action) {
+		if (typeof action.Payload !== 'function') {
+			throw new UpdateClientStateException('Update action of clientState needs to have update callback as payload');
+		}
+		var originalClientStateMap = this.clientStateMap;
+		var nextClientStateMap = originalClientStateMap.reduce(
+			(clientStateMap: Map<string, IClientState>, originalClientState: IClientState, clientId: string) => {
+				var nextClientState = action.Payload(originalClientState);
+				if (nextClientState !== originalClientState) {
+					clientStateMap = clientStateMap.set(clientId, nextClientState);
+				}
+				return clientStateMap;
+			},
+			originalClientStateMap
+		);
+		if (nextClientStateMap !== originalClientStateMap) {
+			this.clientStateMap = nextClientStateMap;
+			nextClientStateMap.forEach((nextClientState: IClientState, clientId: string) => {
+				var originalClientState = originalClientStateMap.get(clientId);
+				if (nextClientState !== originalClientState) {
+					this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState));
+				}
+			});
+		}
+	}
+
+	private create(action: Action) {
+		if (typeof action.Payload !== 'function') {
+			throw new UpdateClientStateException('Create action of clientState needs to have created callback as payload');
+		}
+		var clientId = '' + Math.random();
+		var clientState = Map({});
+		this.clientStateMap = this.clientStateMap.set(clientId, clientState);
+		action.Payload(clientState, clientId);
 	}
 }

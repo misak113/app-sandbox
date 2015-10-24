@@ -20,6 +20,10 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 		return this.createAction(ClientStateActionName.UPDATE, updateCallback);
 	}
 
+	create(createdCallback: (clientState: IClientState, clientId: string) => void): Action {
+		return this.createAction(ClientStateActionName.CREATE, createdCallback);
+	}
+
 	sendDiff(originalState: IClientState, nextState: IClientState): Action {
 		var ops = diff(originalState, nextState);
 		return this.createAction(ClientStateActionName.SEND_DIFF, ops.toJS());
@@ -28,5 +32,6 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 
 export enum ClientStateActionName {
 	UPDATE,
+	CREATE,
 	SEND_DIFF
 }
