@@ -2,7 +2,7 @@
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
 import Action from '../Flux/Action';
-import {UpdateClientStateException} from './exceptions';
+import {UpdateClientStateException, CreateClientStateException} from './exceptions';
 import ClientStateActionCreator, {ClientStateActionName} from './ClientStateActionCreator';
 import IClientState from './IClientState';
 import {Map} from 'immutable';
@@ -59,7 +59,7 @@ export default class ClientStateStore {
 
 	private create(action: Action) {
 		if (typeof action.Payload !== 'function') {
-			throw new UpdateClientStateException('Create action of clientState needs to have created callback as payload');
+			throw new CreateClientStateException('Create action of clientState needs to have created callback as payload');
 		}
 		var clientId = '' + Math.random();
 		var clientState = Map({});
