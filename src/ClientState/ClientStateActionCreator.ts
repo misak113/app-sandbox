@@ -14,7 +14,7 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 	}
 
 	protected getName() {
-		return 'Router.ClientState';
+		return 'ClientState.ClientState';
 	}
 
 	update(updateCallback: (clientState: IClientState, clientId: string) => IClientState): Action {
