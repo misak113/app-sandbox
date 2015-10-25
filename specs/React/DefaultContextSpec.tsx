@@ -1,18 +1,20 @@
 /// <reference path="../../node_modules/di-ts/di-ts.d.ts" />
 
 import DefaultContext from '../../src/React/DefaultContext';
-import {Inject, Provide, Injector as InjectorConstructor} from 'di-ts';
 import {Injector} from 'di';
+import {Inject, Provide, Injector as InjectorConstructor} from 'di-ts';
 import * as React from 'react';
 import IReactDOMServer = require('react-dom/server');
 import {PropTypes, Component} from 'react';
 // TODO react-dom definition is writen bad. Should be static
+/* tslint:disable */
 var ReactDOMServer: IReactDOMServer = require('react-dom/server');
+/* tslint:enable */
 
 describe('React.DefaultContext', () => {
 	class Rider {
 		constructor(
-			public name = 'Michael'
+			public name: string = 'Michael'
 		) { }
 	}
 
@@ -188,7 +190,7 @@ describe('React.DefaultContext', () => {
 
 		class Sign {
 			constructor(
-				public type = 'Stop'
+				public type: string = 'Stop'
 			) {}
 		}
 
@@ -254,7 +256,7 @@ describe('React.DefaultContext', () => {
 		@Provide(Rider)
 		class RaceRider {
 			constructor(
-				public name = 'Alonzo'
+				public name: string = 'Alonzo'
 			) { }
 		}
 

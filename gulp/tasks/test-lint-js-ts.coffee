@@ -6,7 +6,8 @@ errorHandler = require '../lib/errorHandler'
 paths = require '../config/paths'
 
 gulp.task 'test-lint-js-ts', ->
-  return gulp.src paths.ts.src
+  files = paths.ts.src.concat(paths.ts.specs)
+  return gulp.src files
     .pipe tslint({
       config: paths.ts.lint.config
       tslint: require 'tslint'
