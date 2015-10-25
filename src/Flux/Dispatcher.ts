@@ -20,7 +20,7 @@ export default class Dispatcher {
 		return this;
 	}
 
-	bind(actionName: string|string[], actionCallback?: (action: Action) => void) {
+	bind(actionName: string|string[], actionCallback: (action: Action) => void) {
 		var actionNames: string[] = typeof actionName === 'string' ? [actionName] : actionName;
 		actionNames.forEach((actionName: string) => {
 			this.eventEmitter.addListener(actionName, actionCallback);
