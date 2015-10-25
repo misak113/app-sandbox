@@ -2,7 +2,7 @@
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
 import Action from '../Flux/Action';
-import {UpdateClientStateException, CreateClientStateException} from './exceptions';
+import {UpdateClientStateException} from './exceptions';
 import ClientStateActionCreator, {ClientStateActionName} from './ClientStateActionCreator';
 import IClientState from './IClientState';
 import {Map} from 'immutable';
@@ -20,10 +20,16 @@ export default class ClientStateStore {
 	) {
 		this.clientStateMap = Map({});
 		this.dispatcher.bind(
-			this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE), (action: Action) => this.update(action)
+			this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE),
+			(action: Action) => this.update(action)
 		);
 		this.dispatcher.bind(
-			this.clientStateActionCreater.createActionName(ClientStateActionName.GET_OR_CREATE), (action: Action) => this.getOrCreate(action)
+			this.clientStateActionCreater.createActionName(ClientStateActionName.UPDATE_CLIENT),
+			(action: Action) => this.updateClient(action)
+		);
+		this.dispatcher.bind(
+			this.clientStateActionCreater.createActionName(ClientStateActionName.CREATE_IF_NOT_EXISTS),
+			(action: Action) => this.createIfNotExists(action)
 		);
 	}
 
@@ -32,13 +38,14 @@ export default class ClientStateStore {
 	}
 
 	private update(action: Action) {
-		if (typeof action.Payload !== 'function') {
+		var updateCallback = action.Payload;
+		if (typeof updateCallback !== 'function') {
 			throw new UpdateClientStateException('Update action of clientState needs to have update callback as payload');
 		}
 		var originalClientStateMap = this.clientStateMap;
 		var nextClientStateMap = originalClientStateMap.reduce(
 			(clientStateMap: Map<string, IClientState>, originalClientState: IClientState, clientId: string) => {
-				var nextClientState = action.Payload(originalClientState, clientId);
+				var nextClientState = updateCallback(originalClientState, clientId);
 				if (nextClientState !== originalClientState) {
 					clientStateMap = clientStateMap.set(clientId, nextClientState);
 				}
@@ -57,23 +64,34 @@ export default class ClientStateStore {
 		}
 	}
 
-	private getOrCreate(action: Action) {
+	private updateClient(action: Action) {
 		var clientId = action.Payload.clientId;
-		var successCallback = action.Payload.successCallback;
-		if (typeof successCallback !== 'function') {
-			throw new CreateClientStateException('Create action of clientState needs to have created callback as payload');
+		var updateCallback = action.Payload.updateCallback;
+		if (typeof updateCallback !== 'function') {
+			throw new UpdateClientStateException('Update client action of clientState needs to have update callback in payload');
 		}
+		if (!this.clientStateMap.has(clientId)) {
+			throw new UpdateClientStateException('Update client action cannot find clientState by id in payload');
+		}
+		var originalClientState = this.clientStateMap.get(clientId);
+		var nextClientState = updateCallback(originalClientState, clientId);
+		if (nextClientState !== originalClientState) {
+			this.clientStateMap = this.clientStateMap.set(clientId, nextClientState);
+			this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState, clientId));
+		}
+	}
+
+	private createIfNotExists(action: Action) {
+		var clientId = action.Payload.clientId;
 		if (this.clientStateMap.has(clientId)) {
 			var clientState = this.clientStateMap.get(clientId);
 		} else {
-			clientId = this.generateClientId();
 			var clientState = Map({});
 			this.clientStateMap = this.clientStateMap.set(clientId, clientState);
+			this.dispatcher.dispatch(this.clientStateActionCreater.created(clientId));
 		}
-		successCallback(clientState, clientId);
-	}
-
-	private generateClientId() {
-		return '' + Math.random();
+		setTimeout(() => {
+			this.dispatcher.dispatch(this.clientStateActionCreater.createdIfNotExists(clientId));
+		});
 	}
 }

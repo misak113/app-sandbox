@@ -8,8 +8,10 @@ import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
 import IClientState from '../ClientState/IClientState';
-import ClientStateActionCreator from '../ClientState/ClientStateActionCreator';
+import ClientStateStore from '../ClientState/ClientStateStore';
+import ClientStateActionCreator, {ClientStateActionName} from '../ClientState/ClientStateActionCreator';
 import Dispatcher from '../Flux/Dispatcher';
+import Action from '../Flux/Action';
 import routes from '../config/routes';
 import services from '../config/services';
 /* tslint:disable */
@@ -22,7 +24,8 @@ export class RouterContext {
 	constructor(
 		public expressServer: ExpressServer,
 		public clientStateActionCreator: ClientStateActionCreator,
-		public dispatcher: Dispatcher
+		public dispatcher: Dispatcher,
+		public clientStateStore: ClientStateStore
 	) {}
 }
 
@@ -69,28 +72,35 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		} else if (renderProps) {
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
-			var clientId = request.cookies.clientId;
-			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.getOrCreate(clientId, (
-				clientState: IClientState,
-				createdClientId: string
-			) => {
-				if (createdClientId !== clientId) {
-					clientId = createdClientId;
-					response.cookie('clientId', clientId);
+			var clientId = request.cookies.clientId || this.generateClientId();
+			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.createIfNotExists(clientId));
+			var createdIfNotExistsBinding = this.context.dispatcher.bind(
+				this.context.clientStateActionCreator.createActionName(ClientStateActionName.CREATED_IF_NOT_EXISTS),
+				(action: Action) => {
+					if (action.Payload.clientId !== clientId) {
+						return;
+					}
+					this.context.dispatcher.unbind(createdIfNotExistsBinding);
+					var clientState = this.context.clientStateStore.getById(clientId);
+					var body = renderToString(
+						<RoutingContext
+							{...renderProps}
+							injector={injector}
+							componentProps={{ clientState: clientState, clientId: clientId }}/>);
+					var initialScript = this.getInitialScript(clientState);
+					response.status(200)
+						.cookie('clientId', clientId)
+						.header(this.getHeader(body, totalTime, clientId))
+						.send(this.state.doctype + initialScript + body);
 				}
-				var body = renderToString(
-					<RoutingContext
-						{...renderProps}
-						injector={injector}
-						componentProps={{ clientState: clientState, clientId: clientId }}/>);
-				var initialScript = this.getInitialScript(clientState);
-				response.status(200)
-					.header(this.getHeader(body, totalTime, clientId))
-					.send(this.state.doctype + initialScript + body);
-			}));
+			);
 		} else {
 			next();
 		}
+	}
+
+	private generateClientId() {
+		return '' + Math.random();
 	}
 
 	private getInitialScript(clientState: IClientState) {
