@@ -7,16 +7,12 @@ import HostOptions from '../Http/HostOptions';
 export default class ClientSocket {
 
 	private sockets: { [namespace: string]: SocketIOClient.Socket } = {};
-	
+
 	constructor(
 		private hostOptions: HostOptions
 	) {}
 
 	getSocketOf(namespace: string) {
-		var options = {
-			host: this.hostOptions.host,
-			port: this.hostOptions.port
-		};
 		var uri = this.buildUri(namespace);
 		return this.sockets[namespace] = this.sockets[namespace] || io(uri);
 	}

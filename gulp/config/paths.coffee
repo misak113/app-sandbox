@@ -19,6 +19,8 @@ paths = {
       basePath + '/specs/**/*.ts'
       basePath + '/specs/**/*.tsx'
     ]
+    lint:
+      config: basePath + '/tslint.json'
   tsd:
     config: basePath + '/tsd.json'
     src: basePath + '/typings/tsd.d.ts'

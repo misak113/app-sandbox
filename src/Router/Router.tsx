@@ -7,22 +7,32 @@ import {Inject} from 'di-ts';
 import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
+import IClientState from '../ClientState/IClientState';
+import ClientStateStore from '../ClientState/ClientStateStore';
+import ClientStateActionCreator, {ClientStateActionName} from '../ClientState/ClientStateActionCreator';
+import Dispatcher from '../Flux/Dispatcher';
+import Action from '../Flux/Action';
 import routes from '../config/routes';
 import services from '../config/services';
+/* tslint:disable */
 var match = require('react-router').match;
 var renderToString = require('react-dom/server').renderToString;
+/* tslint:enable */
 
 @Inject
 export class RouterContext {
 	constructor(
-		public expressServer: ExpressServer
+		public expressServer: ExpressServer,
+		public clientStateActionCreator: ClientStateActionCreator,
+		public dispatcher: Dispatcher,
+		public clientStateStore: ClientStateStore
 	) {}
 }
 
 @DefaultContext(RouterContext)
 export default class Router extends Component<{ doctype?: string }, { doctype?: string }, RouterContext> {
 
-	constructor(props, context) {
+	constructor(props: { doctype?: string }, context: RouterContext) {
 		super(props, context);
 		this.state = {
 			doctype: props.doctype || '<!doctype html>'
@@ -35,20 +45,20 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 
 	private handle(request: Request, response: Response, next: () => void) {
 		var startTime = process.hrtime();
-		match({
-			routes,
+		var options = {
+			routes: routes,
 			location: request.url
-		}, (
-			error: Error,
-			redirectLocation: IRedirectLocation,
-			renderProps: IRenderProps
-		) => this.match(error, redirectLocation, renderProps, response, startTime, next));
+		};
+		match(options, (error: Error, redirectLocation: IRedirectLocation, renderProps: IRenderProps) => this.match(
+			error, redirectLocation, renderProps, request, response, startTime, next
+		));
 	}
 
 	private match(
 		error: Error,
 		redirectLocation: IRedirectLocation,
 		renderProps: IRenderProps,
+		request: Request,
 		response: Response,
 		startTime: number[],
 		next: () => void
@@ -62,20 +72,50 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 		} else if (renderProps) {
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
-			var body = renderToString(<RoutingContext {...renderProps} injector={injector} />);
-			response.status(200)
-				.header(this.getHeader(body, totalTime))
-				.send(this.state.doctype + body);
+			var clientId = request.cookies.clientId || this.generateClientId();
+			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.createIfNotExists(clientId));
+			var createdIfNotExistsBinding = this.context.dispatcher.bind(
+				this.context.clientStateActionCreator.createActionName(ClientStateActionName.CREATED_IF_NOT_EXISTS),
+				(action: Action) => {
+					if (action.Payload.clientId !== clientId) {
+						return;
+					}
+					this.context.dispatcher.unbind(createdIfNotExistsBinding);
+					var clientState = this.context.clientStateStore.getById(clientId);
+					var body = renderToString(
+						<RoutingContext
+							{...renderProps}
+							injector={injector}
+							componentProps={{ clientState: clientState, clientId: clientId }}/>);
+					var initialScript = this.getInitialScript(clientState);
+					response.status(200)
+						.cookie('clientId', clientId)
+						.header(this.getHeader(body, totalTime, clientId))
+						.send(this.state.doctype + initialScript + body);
+				}
+			);
 		} else {
 			next();
 		}
 	}
 
-	private getHeader(body: string, totalTime: number[]) {
+	private generateClientId() {
+		return '' + Math.random();
+	}
+
+	private getInitialScript(clientState: IClientState) {
+		var clientStateJson = JSON.stringify(clientState.toJS());
+		return `<script>
+			var clientState = ` + clientStateJson + `;
+		</script>`;
+	}
+
+	private getHeader(body: string, totalTime: number[], clientId: string) {
 		return {
-			"Content-Length": body.length,
-			"Content-Type": "text/html",
-			"X-Render-Time": this.getMiliseconds(totalTime) + " ms"
+			'Content-Length': body.length,
+			'Content-Type': 'text/html',
+			'X-Render-Time': this.getMiliseconds(totalTime) + ' ms',
+			'X-Client-Id': clientId
 		};
 	}
 

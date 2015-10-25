@@ -11,14 +11,16 @@ export default class Dispatcher {
 	constructor() {
 		this.eventEmitter = new EventEmitter();
 	}
-	
+
 	dispatch(action: Action) {
-		this.eventEmitter.emit(action.Name, action);
-		this.eventEmitter.emit('*', action);
+		setTimeout(() => {
+			this.eventEmitter.emit(action.Name, action);
+			this.eventEmitter.emit('*', action);
+		});
 		return this;
 	}
 
-	bind(actionName: string|string[], actionCallback?: (action: Action) => void) {
+	bind(actionName: string|string[], actionCallback: (action: Action) => void) {
 		var actionNames: string[] = typeof actionName === 'string' ? [actionName] : actionName;
 		actionNames.forEach((actionName: string) => {
 			this.eventEmitter.addListener(actionName, actionCallback);

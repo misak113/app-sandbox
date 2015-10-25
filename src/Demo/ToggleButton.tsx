@@ -4,7 +4,6 @@ import {Inject} from 'di-ts';
 import Component from '../React/Component';
 import DefaultContext from '../React/DefaultContext';
 import Dispatcher from '../Flux/Dispatcher';
-import Action from '../Flux/Action';
 import StatusActionCreator from './StatusActionCreator';
 
 @Inject

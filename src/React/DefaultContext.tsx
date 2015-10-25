@@ -7,8 +7,11 @@ import ReactComponent from './Component';
 import {Injector} from 'di';
 import {InjectorMissingException} from './exceptions';
 
-export default function DefaultContext(Context: any): ClassDecorator {
-	return (Component: ComponentClass<any>) => {
+/* tslint:disable:variable-name */
+export default function DefaultContext(contextStatic: any): ClassDecorator {
+	'use strict';
+	return (ComponentStatic: ComponentClass<any>) => {
+		/* tslint:enable */
 		class ComponentWithContext extends ReactComponent<any, any, { injector: Injector }> {
 
 			static contextTypes: ValidationMap<any> = {
@@ -24,17 +27,17 @@ export default function DefaultContext(Context: any): ClassDecorator {
 				if (!this.context.injector) {
 					throw new InjectorMissingException('You must pass injector to context of any parent component');
 				}
-				Component.contextTypes = Component.contextTypes || {};
-				var context = this.context.injector.get(Context);
+				ComponentStatic.contextTypes = ComponentStatic.contextTypes || {};
+				var context = this.context.injector.get(contextStatic);
 				Object.keys(context).forEach((key: string) => {
-					if (!Component.contextTypes[key]) {
-						Component.contextTypes[key] = PropTypes.any.isRequired;
+					if (!ComponentStatic.contextTypes[key]) {
+						ComponentStatic.contextTypes[key] = PropTypes.any.isRequired;
 					}
 					ComponentWithContext.childContextTypes[key] = PropTypes.any.isRequired;
 				});
 				Object.keys(this.context).forEach((key: string) => {
-					if (!Component.contextTypes[key]) {
-						Component.contextTypes[key] = PropTypes.any.isRequired;
+					if (!ComponentStatic.contextTypes[key]) {
+						ComponentStatic.contextTypes[key] = PropTypes.any.isRequired;
 					}
 					context[key] = this.context[key];
 				});
@@ -42,13 +45,13 @@ export default function DefaultContext(Context: any): ClassDecorator {
 			}
 
 			render() {
-				return <Component {...this.props}/>;
+				return <ComponentStatic {...this.props}/>;
 			}
 		}
-		var contextTypes = Component.contextTypes || {};
+		var contextTypes = ComponentStatic.contextTypes || {};
 		Object.keys(contextTypes).forEach((key: string) => {
 			ComponentWithContext.contextTypes[key] = contextTypes[key];
 		});
 		return ComponentWithContext as any as ComponentClass<any>;
-	}
+	};
 }

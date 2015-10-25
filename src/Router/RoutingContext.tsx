@@ -3,10 +3,13 @@ import * as React from 'react';
 import {PropTypes, ValidationMap} from 'react';
 import Component from '../React/Component';
 import {Injector} from 'di';
+/* tslint:disable */
 var ReactRouterRoutingContext = require('react-router').RoutingContext;
+/* tslint:enable */
 
 export interface IRoutingContextProps {
 	injector: Injector;
+	[name: string]: any;
 }
 
 export interface IRoutingContextChildContext {
