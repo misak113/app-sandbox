@@ -13,8 +13,10 @@ export default class Dispatcher {
 	}
 
 	dispatch(action: Action) {
-		this.eventEmitter.emit(action.Name, action);
-		this.eventEmitter.emit('*', action);
+		setTimeout(() => {
+			this.eventEmitter.emit(action.Name, action);
+			this.eventEmitter.emit('*', action);
+		});
 		return this;
 	}
 
