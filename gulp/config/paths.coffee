@@ -1,10 +1,11 @@
 
 basePath = __dirname + '/../..'
 npmConfig = require basePath + '/package.json'
+dist = basePath + '/dist'
 
 paths = {
   basePath: basePath
-  dist: basePath + '/dist'
+  dist: dist
   front:
     mainFile: basePath + '/front.js'
   back:
@@ -26,5 +27,7 @@ paths = {
     src: basePath + '/typings/tsd.d.ts'
   less:
     src: basePath + '/src/index.less'
+  reports:
+    coveragePath: dist + '/reports/coverage'
 }
 module.exports = paths
