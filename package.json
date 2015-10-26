@@ -39,6 +39,7 @@
   "devDependencies": {
     "cli-color": "^1.0.0",
     "coffee-script": "^1.10.0",
+    "coveralls": "^2.11.4",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
     "gulp-develop-server": "^0.4.3",
