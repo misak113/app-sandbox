@@ -1,7 +1,7 @@
 
 gulp = require 'gulp'
-require './watch-css-less'
+require './watch-css-sass'
 
 gulp.task 'watch-css', [
-  'watch-css-less'
+  'watch-css-sass'
 ]

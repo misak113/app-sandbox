@@ -1,7 +1,7 @@
 
 gulp = require 'gulp'
-require './build-css-less'
+require './build-css-sass'
 
 gulp.task 'build-css', [
-  'build-css-less'
+  'build-css-sass'
 ]

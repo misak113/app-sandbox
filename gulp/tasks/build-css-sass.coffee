@@ -1,12 +1,14 @@
 
 gulp = require 'gulp'
-less = require 'gulp-less'
+sass = require 'gulp-sass'
 plumber = require 'gulp-plumber'
 errorHandler = require '../lib/errorHandler'
 paths = require '../config/paths'
 
-gulp.task 'build-css-less', ->
-  return gulp.src([paths.less.src])
+gulp.task 'build-css-sass', ->
+  return gulp.src([paths.sass.src])
     .pipe plumber(errorHandler)
-    .pipe less()
+    .pipe sass({
+      outputStyle: 'compressed'
+    })
     .pipe gulp.dest(paths.dist + '/css')
