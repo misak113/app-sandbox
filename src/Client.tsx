@@ -1,4 +1,8 @@
 
+// TODO temporary load of jQuery into global context for bootstrap
+import * as jQuery from 'jquery';
+(window as any).jQuery = jQuery;
+import 'bootstrap';
 import * as React from 'react';
 import {PropTypes, ValidationMap} from 'react';
 import Component from './React/Component';
