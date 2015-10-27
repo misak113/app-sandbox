@@ -1,0 +1,6 @@
+
+@mixin Layout-Navigation {
+	// Because of .navbar-fixed-top disapear content top 50px
+	// needs to be on body tag
+	padding-top: 50px;
+}

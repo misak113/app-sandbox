@@ -1,4 +1,8 @@
 
-body {
-	
+@import './Navigation';
+
+@mixin Main {
+	body.main {
+		@include Layout-Navigation;
+	}
 }

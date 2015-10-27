@@ -15,7 +15,7 @@ export default class Main extends Component<{ children: any[]; location: any; },
 					<title>App sandbox</title>
 					<link rel='stylesheet' media='all' href='/css/index.css'></link>
 				</head>
-				<body>
+				<body className="main">
 					<Navigation activePath={this.props.location.pathname}/>
 					{this.props.children}
 					<script src='/front-bundle.js'></script>
