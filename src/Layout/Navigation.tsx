@@ -19,7 +19,7 @@ export default class Navigation extends Component<{ activePath: string; }, {}, {
 					</div>
 				</div>
 				<div id="navbar" className="navbar-collapse collapse">
-					<ul className="nav navbar-nav">
+					<ul className="nav navbar-nav" role="navigation">
 						<li className={classNames(this.props.activePath === '/' ? "active" : null)}>
 							<Link to="/">Demo</Link>
 						</li>
