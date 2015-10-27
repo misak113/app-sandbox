@@ -40,7 +40,7 @@
         "check-else",
         "check-whitespace"
     ],
-    "quotemark": [true, "single"],
+    "quotemark": [true],
     "radix": true,
     "semicolon": true,
     "switch-default": true,
