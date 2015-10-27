@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import Component from '../React/Component';
-import ResponsiveButton from './ResponsiveButton';
+import TogglerButton from './TogglerButton';
 import {classNames} from '../React/helper';
 /* tslint:disable */
 var Link = require('react-router').Link;
@@ -12,7 +12,7 @@ export default class Navigation extends Component<{ activePath: string; }, {}, {
 	render() {
 		return (
 			<nav className="navbar navbar-fixed-top navbar-dark bg-inverse">
-				<ResponsiveButton target="#navbar"/>
+				<TogglerButton target="#navbar"/>
 				<div className="navbar-brand">
 					App sandbox
 				</div>

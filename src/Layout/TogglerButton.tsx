@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Component from '../React/Component';
 
-export default class ResponsiveButton extends Component<{ target: string; }, {}, {}> {
+export default class TogglerButton extends Component<{ target: string; }, {}, {}> {
 
 	render() {
 		return (
