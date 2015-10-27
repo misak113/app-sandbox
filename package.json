@@ -37,7 +37,7 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "bootstrap": "git+https://github.com/twbs/bootstrap#v4.0.0-alpha",
+    "bootstrap": "^3.3.5",
     "cli-color": "^1.0.0",
     "coffee-script": "^1.10.0",
     "coveralls": "^2.11.4",

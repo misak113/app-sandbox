@@ -1,8 +1,9 @@
 
 import * as React from 'react';
 import Component from '../React/Component';
+import Navigation from './Navigation';
 
-export default class Main extends Component<{ children: any[] }, {}, {}> {
+export default class Main extends Component<{ children: any[]; location: any; }, {}, {}> {
 
 	render() {
 		return (
@@ -15,6 +16,7 @@ export default class Main extends Component<{ children: any[] }, {}, {}> {
 					<link rel='stylesheet' media='all' href='/css/index.css'></link>
 				</head>
 				<body>
+					<Navigation activePath={this.props.location.pathname}/>
 					{this.props.children}
 					<script src='/front-bundle.js'></script>
 				</body>
