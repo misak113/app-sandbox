@@ -7,14 +7,12 @@ export default class ResponsiveButton extends Component<{ target: string; }, {},
 	render() {
 		return (
 			<button type="button"
-				className="navbar-toggle collapsed"
+				className="navbar-toggler hidden-sm-up pull-right"
 				data-toggle="collapse"
 				data-target={this.props.target}
 				aria-expanded="false">
-				<span className="sr-only">Toggle navigation</span>
-				<span className="icon-bar"></span>
-				<span className="icon-bar"></span>
-				<span className="icon-bar"></span>
+				{/*&#9776;*/}
+				☰
 			</button>
 		);
 	}
