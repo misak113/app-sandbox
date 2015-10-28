@@ -2,6 +2,7 @@
 import * as React from 'react';
 import Main from '../Layout/Main';
 import Homepage from '../Demo/Homepage';
+import UsersPage from '../Demo/User/UsersPage';
 /* tslint:disable */
 var Route = require('react-router').Route;
 var IndexRoute = require('react-router').IndexRoute;
@@ -11,7 +12,7 @@ var Route = require('react-router').Route;
 var routes = (
 	<Route path="/" component={Main}>
 		<IndexRoute component={Homepage}/>
-		<Route path="/users" component={Homepage}/>
+		<Route path="/users" component={UsersPage}/>
 	</Route>
 );
 
