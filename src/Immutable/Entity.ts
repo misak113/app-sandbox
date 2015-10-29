@@ -59,12 +59,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 						return result;
 					}
 				};
-			},
-			set: (newMethod: any) => {
-				OriginalEntityClass.prototype[methodName] = newMethod;
-			},
-			enumerable: true,
-			configurable: false
+			}
 		});
 	});
 	class EntityClass {
