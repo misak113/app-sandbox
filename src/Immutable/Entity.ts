@@ -6,9 +6,7 @@ import { Map } from 'immutable';
 
 var entityStorage: Map<IEntityStatic<any>, Map<Map<string, any>, any>>;
 
-/* tslint:disable */
 var storeEntity = (OriginalEntityClass: IEntityStatic<any>, entity: any) => {
-	/* tslint:enable */
 	if (!entityStorage) {
 		entityStorage = Map<IEntityStatic<any>, Map<Map<string, any>, any>>();
 	}
@@ -18,9 +16,7 @@ var storeEntity = (OriginalEntityClass: IEntityStatic<any>, entity: any) => {
 	entityStorage = entityStorage.setIn([OriginalEntityClass, entity.data], entity);
 };
 
-/* tslint:disable */
 var restoreEntity = (OriginalEntityClass: IEntityStatic<any>, data: Map<string, any>) => {
-	/* tslint:enable */
 	if (entityStorage && entityStorage.hasIn([OriginalEntityClass, data])) {
 		return entityStorage.getIn([OriginalEntityClass, data]);
 	} else {
@@ -28,16 +24,12 @@ var restoreEntity = (OriginalEntityClass: IEntityStatic<any>, data: Map<string, 
 	}
 };
 
-/* tslint:disable */
 var getMethodNames = (OriginalEntityClass: IEntityStatic<any>) => {
-	/* tslint:enable */
 	var methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
 	return methodNames.filter((methodName: string) => methodName !== 'constructor');
 };
 
-/* tslint:disable */
 var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
-	/* tslint:enable */
 	type Properties = { [propertyKey: string]: any };
 	var proxyEntity: Properties = new EntityProxy();
 	var overridenProperties: Properties = {};
@@ -62,9 +54,7 @@ var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
 	return proxyEntity;
 };
 
-/* tslint:disable */
 function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
-	/* tslint:enable */
 	'use strict';
 
 	var getOrCreateEntity = (data: Map<string, any>) => {

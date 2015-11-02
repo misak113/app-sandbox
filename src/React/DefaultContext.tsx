@@ -7,11 +7,9 @@ import ReactComponent from './Component';
 import {Injector} from 'di';
 import {InjectorMissingException} from './exceptions';
 
-/* tslint:disable:variable-name */
 export default function DefaultContext(contextStatic: any): ClassDecorator {
 	'use strict';
 	return (ComponentStatic: ComponentClass<any>) => {
-		/* tslint:enable */
 		class ComponentWithContext extends ReactComponent<any, any, { injector: Injector }> {
 
 			static contextTypes: ValidationMap<any> = {
