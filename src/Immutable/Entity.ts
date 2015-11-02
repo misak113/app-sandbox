@@ -29,9 +29,44 @@ var restoreEntity = (OriginalEntityClass: IEntityStatic<any>, data: Map<string, 
 };
 
 /* tslint:disable */
+var getMethodNames = (OriginalEntityClass: IEntityStatic<any>) => {
+	/* tslint:enable */
+	var methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
+	return methodNames.filter((methodName: string) => methodName !== 'constructor');
+};
+
+/* tslint:disable */
+var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
+	/* tslint:enable */
+	type Properties = { [propertyKey: string]: any };
+	var proxyEntity: Properties = new EntityProxy();
+	var overridenProperties: Properties = {};
+	entity.data.forEach((value: any, propertyKey: string) => {
+		Object.defineProperty(proxyEntity, propertyKey, {
+			get: () => {
+				return Object.keys(overridenProperties).indexOf(propertyKey) !== -1
+					? overridenProperties[propertyKey]
+					: entity.data.get(propertyKey);
+			},
+			set: (value: any) => {
+				overridenProperties[propertyKey] = value;
+				Object.defineProperty(proxyEntity, propertyKey, {
+					enumerable: true
+				});
+			},
+			enumerable: false,
+			configurable: true
+		});
+	});
+
+	return proxyEntity;
+};
+
+/* tslint:disable */
 function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 	/* tslint:enable */
 	'use strict';
+
 	var getOrCreateEntity = (data: Map<string, any>) => {
 		var nextEntity = restoreEntity(OriginalEntityClass, data);
 		if (!nextEntity) {
@@ -41,37 +76,34 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 		}
 		return nextEntity;
 	};
-	var createProxyEntity = (entity: EntityClass) => {
-		type Properties = { [propertyKey: string]: any };
-		var proxyEntity: Properties = {};
-		var overridenProperties: Properties = {};
-		entity.data.forEach((value: any, propertyKey: string) => {
-			Object.defineProperty(proxyEntity, propertyKey, {
-				get: () => {
-					return Object.keys(overridenProperties).indexOf(propertyKey) !== -1
-						? overridenProperties[propertyKey]
-						: entity.data.get(propertyKey);
-				},
-				set: (value: any) => {
-					overridenProperties[propertyKey] = value;
-					Object.defineProperty(proxyEntity, propertyKey, {
-						enumerable: true
-					});
-				},
-				enumerable: false,
-				configurable: true
+
+	class EntityProxy { }
+
+	class EntityClass {
+
+		/** @internal */
+		public data: Map<string, any> = Map({});
+
+		constructor(...args: any[]) {
+			var originalEntity = new OriginalEntityClass(...args);
+			Object.keys(originalEntity).forEach((propertyKey: string) => {
+				this.data = this.data.set(propertyKey, originalEntity[propertyKey]);
 			});
-		});
-		return proxyEntity;
-	};
-	var methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
-	methodNames.forEach((methodName: string) => {
+			storeEntity(OriginalEntityClass, this);
+		}
+	}
+	EntityClass.prototype = OriginalEntityClass.prototype;
+
+	getMethodNames(OriginalEntityClass).forEach((methodName: string) => {
 		var originalMethod = OriginalEntityClass.prototype[methodName];
-		Object.defineProperty(OriginalEntityClass.prototype, methodName, {
+		Object.defineProperty(EntityProxy.prototype, methodName, {
+			get: () => originalMethod
+		});
+		Object.defineProperty(EntityClass.prototype, methodName, {
 			get: () => {
 				return function(...args: any[]) {
 					var originalEntity: EntityClass = this;
-					var proxyEntity = createProxyEntity(originalEntity);
+					var proxyEntity = createProxyEntity(EntityProxy, originalEntity);
 					var result = originalMethod.apply(proxyEntity, args);
 					var propertyKeys = Object.keys(proxyEntity);
 					if (propertyKeys.length) { // any set of private properties
@@ -97,20 +129,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 			}
 		});
 	});
-	class EntityClass {
 
-		/** @internal */
-		public data: Map<string, any> = Map({});
-
-		constructor(...args: any[]) {
-			var originalEntity = new OriginalEntityClass(...args);
-			Object.keys(originalEntity).forEach((propertyKey: string) => {
-				this.data = this.data.set(propertyKey, originalEntity[propertyKey]);
-			});
-			storeEntity(OriginalEntityClass, this);
-		}
-	}
-	EntityClass.prototype = OriginalEntityClass.prototype;
 	return <IEntityStatic<IEntity>><any>EntityClass;
 };
 export default Entity as ClassDecorator;

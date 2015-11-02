@@ -12,7 +12,9 @@ describe('Immutable.Entity', () => {
 		constructor(
 			private firstName: string,
 			private lastName: string
-		) {}
+		) {
+			//this.setId(1);
+		}
 
 		getId() {
 			return this.id;
@@ -47,6 +49,12 @@ describe('Immutable.Entity', () => {
 			return this;
 		}
 
+		setFullNameBySetters(firstName: string, lastName: string) {
+			this.setLastName(lastName);
+			this.setFirstName(firstName);
+			return this;
+		}
+
 		setNothing() {
 			return this;
 		}
@@ -75,6 +83,13 @@ describe('Immutable.Entity', () => {
 	it('should set multiple properties at once by setter method', () => {
 		var user = new User('Michael', 'Žabka');
 		user = user.setFullName('Kateřina', 'Švecová');
+		expect(user.getFirstName()).toBe('Kateřina');
+		expect(user.getLastName()).toBe('Švecová');
+	});
+
+	it('should set properties using internal call of setters', () => {
+		var user = new User('Michael', 'Žabka');
+		user = user.setFullNameBySetters('Kateřina', 'Švecová');
 		expect(user.getFirstName()).toBe('Kateřina');
 		expect(user.getLastName()).toBe('Švecová');
 	});
