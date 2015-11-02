@@ -13,7 +13,7 @@ describe('Immutable.Entity', () => {
 			private firstName: string,
 			private lastName: string
 		) {
-			//this.setId(1);
+			this.setId(1);
 		}
 
 		getId() {

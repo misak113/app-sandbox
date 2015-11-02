@@ -85,9 +85,10 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 		public data: Map<string, any> = Map({});
 
 		constructor(...args: any[]) {
-			var originalEntity = new OriginalEntityClass(...args);
-			Object.keys(originalEntity).forEach((propertyKey: string) => {
-				this.data = this.data.set(propertyKey, originalEntity[propertyKey]);
+			var proxyEntity = createProxyEntity(EntityProxy, this);
+			OriginalEntityClass.apply(proxyEntity, args);
+			Object.keys(proxyEntity).forEach((propertyKey: string) => {
+				this.data = this.data.set(propertyKey, proxyEntity[propertyKey]);
 			});
 			storeEntity(OriginalEntityClass, this);
 		}
