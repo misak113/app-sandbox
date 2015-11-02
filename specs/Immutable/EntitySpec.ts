@@ -94,13 +94,9 @@ describe('Immutable.Entity', () => {
 		var user = new User('Michael', 'Žabka');
 
 		var newUser = user.setFirstName('Gabriela');
-		expect(user).not.toBe(newUser);
-		expect(user).not.toEqual(newUser);
 		expect(user === newUser).toBeFalsy();
 
-		var sameUser = user.setFirstName('Michael');
-		expect(user).toBe(sameUser);
-		expect(user).toEqual(sameUser);
+		var sameUser = newUser.setFirstName('Michael');
 		expect(user === sameUser).toBeTruthy();
 	});
 
