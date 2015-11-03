@@ -4,7 +4,7 @@ import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';
 import Entity from './Entity';
 import {Map} from 'immutable';
-import { storeEntity, restoreEntity } from './EntityStorage';
+import { restoreEntity } from './EntityStorage';
 
 export default class Convertor {
 
@@ -42,7 +42,6 @@ export default class Convertor {
 		if (entity === null) {
 			entity = new EntityClassConstructor();
 			(<any>entity).data = data;
-			storeEntity(EntityClass, entity);
 		}
 		return entity;
 	}

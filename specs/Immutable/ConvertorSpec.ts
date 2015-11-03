@@ -102,6 +102,21 @@ describe('Immutable.Convertor', () => {
 		expect(convertedUser).toBe(user);
 	});
 
+	it('should return same instance if data are same', () => {
+		var data = {
+			name: 'Michael',
+			address: {
+				street: 'Falešná'
+			},
+			skype: {
+				nickName: 'misak113'
+			}
+		};
+		var user1 = convertor.convertFromJS(User, data);
+		var user2 = convertor.convertFromJS(User, data);
+		expect(user1).toBe(user2);
+	});
+
 	/*
 	it('should not allow create entity by wrong JS object', () => {
 		var user = new User(undefined, undefined);
