@@ -14,6 +14,11 @@ class Skype {
 	getNickName() {
 		return this.nickName;
 	}
+
+	setNickName(nickName: string) {
+		this.nickName = nickName;
+		return this;
+	}
 }
 
 @Entity
@@ -123,6 +128,33 @@ describe('Immutable.Convertor', () => {
 		expect(user1).toBe(user2);
 	});
 
+	it('should diff & patch entity to be same result entity', () => {
+		var skype = new Skype('misak113');
+		var address = new Address('Falešná');
+		var user = new User('Michael', address);
+		user = user.setSkype(skype);
+
+		var changedSkype = skype.setNickName('oleg');
+		var changedUser = user.setSkype(changedSkype);
+
+		var ops = convertor.diff(User, user, changedUser);
+
+		expect(ops.toJS()).toEqual([
+			{ op: 'replace', path: '/skype/nickName', value: 'oleg' }
+		]);
+
+		var patchedUser = convertor.patch(User, user, ops);
+
+		expect(patchedUser).toBe(changedUser);
+		expect(user.getSkype()).toBe(skype);
+
+		expect(patchedUser.getSkype()).toBe(changedSkype);
+		expect(changedUser.getSkype()).toBe(changedSkype);
+
+		expect(user.getSkype().getNickName()).toBe('misak113');
+		expect(changedUser.getSkype().getNickName()).toBe('oleg');
+	});
+
 	/*
 	it('should not allow create entity by wrong JS object', () => {
 		var user = new User(undefined, undefined);
@@ -130,17 +162,5 @@ describe('Immutable.Convertor', () => {
 			.toThrow(new InvalidDirectPropertySetException(
 				'Every set property must be annotated by Property'
 			));
-	});
-
-	it('should update internal map by update callback', () => {
-		var user = new User('Michael', 'Žabka');
-		var newUser = user.update((data: Map<string, any>) => {
-			data = data.set('lastName', 'Švecová');
-			return data;
-		});
-		expect(newUser).not.toBe(user);
-		expect(newUser instanceof User).toBeTruthy();
-		expect(newUser.getFirstName()).toBe('Michael');
-		expect(newUser.getLastName()).toBe('Švecová');
 	});*/
 });

@@ -3,8 +3,12 @@ import {ArgumentIsNotImmutableEntityException} from './exceptions';
 import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';
 import Entity from './Entity';
-import {Map} from 'immutable';
+import {Map, List, fromJS} from 'immutable';
 import EntityStorage from './EntityStorage';
+/* tslint:disable */
+var diff = require('immutablediff');
+var patch = require('immutablepatch');
+/* tslint:enable */
 
 export default class Convertor {
 
@@ -48,6 +52,18 @@ export default class Convertor {
 			(<any>entity).data = data;
 		}
 		return entity;
+	}
+
+	diff<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, sourceEntity: IEntity, targetEntity: IEntity): List<any> {
+		var sourceData = this.convertToJS(EntityClassConstructor, sourceEntity);
+		var targetData = this.convertToJS(EntityClassConstructor, targetEntity);
+		return diff(fromJS(sourceData), fromJS(targetData));
+	}
+
+	patch<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, sourceEntity: IEntity, ops: List<any>): IEntity {
+		var sourceData = this.convertToJS(EntityClassConstructor, sourceEntity);
+		var targetData = patch(fromJS(sourceData), ops).toJS();
+		return this.convertFromJS(EntityClassConstructor, targetData);
 	}
 
 	private getOriginalEntityClass<IEntity>(EntityClass: IEntityStatic<IEntity>) {
