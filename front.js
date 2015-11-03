@@ -10,6 +10,6 @@ var services = require("./dist/js/src/config/services").default;
 var Client = require('./dist/js/src/Client').default;
 console.info('Starting Client');
 ReactDOM.render(
-	React.createElement(Client, { injector: new Injector(services) }),
+	React.createElement(Client, { injector: new Injector(services), ClientState: require('./dist/js/src/Demo/ClientState').default }),
 	document
 );

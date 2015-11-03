@@ -9,11 +9,15 @@ import * as serveStatic from 'serve-static';
 import * as cookieParser from 'cookie-parser';
 import ExpressServer from './Http/ExpressServer';
 import HttpServer from './Http/HttpServer';
+import IEntityStatic from './Immutable/IEntityStatic';
+import { setEntityStorage } from './Immutable/Entity';
+import EntityStorage from './Immutable/EntityStorage';
 import ServerOptions from './Http/ServerOptions';
 import stores from './config/stores';
 
-export interface IServerProps {
+export interface IServerProps<IClientState> {
 	injector: Injector;
+	ClientState: IEntityStatic<IClientState>;
 }
 
 export interface IServerState {
@@ -23,14 +27,15 @@ export interface IServerState {
 	serverOptions: ServerOptions;
 }
 
-export default class Server extends Component<IServerProps, IServerState, {}> {
+export default class Server<IClientState> extends Component<IServerProps<IClientState>, IServerState, {}> {
 
 	static childContextTypes: ValidationMap<any> = {
 		injector: PropTypes.object
 	};
 
-	constructor(props: IServerProps, context: {}) {
+	constructor(props: IServerProps<IClientState>, context: {}) {
 		super(props, context);
+		setEntityStorage(this.props.injector.get(EntityStorage));
 		this.state = {
 			expressServer: this.props.injector.get(ExpressServer),
 			serverDispatcher: this.props.injector.get(ServerDispatcher),
@@ -57,7 +62,7 @@ export default class Server extends Component<IServerProps, IServerState, {}> {
 
 	render() {
 		return (
-			<Router/>
+			<Router ClientState={this.props.ClientState as IEntityStatic<any>}/>
 		);
 	}
 }

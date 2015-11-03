@@ -7,10 +7,11 @@ import {Inject} from 'di-ts';
 import {Injector} from 'di';
 import RoutingContext from './RoutingContext';
 import ExpressServer from '../Http/ExpressServer';
-import IClientState from '../ClientState/IClientState';
 import ClientStateStore from '../ClientState/ClientStateStore';
 import ClientStateActionCreator, {ClientStateActionName} from '../ClientState/ClientStateActionCreator';
 import Dispatcher from '../Flux/Dispatcher';
+import Convertor from '../Immutable/Convertor';
+import IEntityStatic from '../Immutable/IEntityStatic';
 import Action from '../Flux/Action';
 import routes from '../config/routes';
 import services from '../config/services';
@@ -25,14 +26,20 @@ export class RouterContext {
 		public expressServer: ExpressServer,
 		public clientStateActionCreator: ClientStateActionCreator,
 		public dispatcher: Dispatcher,
-		public clientStateStore: ClientStateStore
+		public clientStateStore: ClientStateStore,
+		public convertor: Convertor
 	) {}
 }
 
-@DefaultContext(RouterContext)
-export default class Router extends Component<{ doctype?: string }, { doctype?: string }, RouterContext> {
+export interface IRouterProps<IClientState> {
+	doctype?: string;
+	ClientState: IEntityStatic<IClientState>;
+}
 
-	constructor(props: { doctype?: string }, context: RouterContext) {
+@DefaultContext(RouterContext)
+export default class Router<IClientState> extends Component<IRouterProps<IClientState>, { doctype?: string }, RouterContext> {
+
+	constructor(props: IRouterProps<IClientState>, context: RouterContext) {
 		super(props, context);
 		this.state = {
 			doctype: props.doctype || '<!doctype html>'
@@ -73,7 +80,10 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 			var totalTime = process.hrtime(startTime);
 			var injector = new Injector(services);
 			var clientId = request.cookies.clientId || this.generateClientId();
-			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.createIfNotExists(clientId));
+			this.context.dispatcher.dispatch(this.context.clientStateActionCreator.createIfNotExists(
+				this.props.ClientState,
+				clientId
+			));
 			var createdIfNotExistsBinding = this.context.dispatcher.bind(
 				this.context.clientStateActionCreator.createActionName(ClientStateActionName.CREATED_IF_NOT_EXISTS),
 				(action: Action) => {
@@ -81,7 +91,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 						return;
 					}
 					this.context.dispatcher.unbind(createdIfNotExistsBinding);
-					var clientState = this.context.clientStateStore.getById(clientId);
+					var clientState = this.context.clientStateStore.getById<IClientState>(clientId);
 					var body = renderToString(
 						<RoutingContext
 							{...renderProps}
@@ -104,7 +114,7 @@ export default class Router extends Component<{ doctype?: string }, { doctype?: 
 	}
 
 	private getInitialScript(clientState: IClientState) {
-		var clientStateJson = JSON.stringify(clientState.toJS());
+		var clientStateJson = JSON.stringify(this.context.convertor.convertToJS(this.props.ClientState, clientState));
 		return `<script>
 			var clientState = ` + clientStateJson + `;
 		</script>`;

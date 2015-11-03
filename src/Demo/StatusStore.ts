@@ -4,7 +4,7 @@ import Dispatcher from '../Flux/Dispatcher';
 import Action from '../Flux/Action';
 import StatusActionCreator, {StatusActionName} from './StatusActionCreator';
 import ClientStateActionCreator, {ClientStateActionName} from '../ClientState/ClientStateActionCreator';
-import IClientState from '../ClientState/IClientState';
+import ClientState from './ClientState';
 
 @Inject
 export default class StatusStore {
@@ -33,19 +33,21 @@ export default class StatusStore {
 	private update(clientId?: string) {
 		if (clientId) {
 			var action = this.clientStateActionCreator.updateClient(
+				ClientState,
 				clientId,
-				(clientState: IClientState) => this.getUpdatedClientState(clientState)
+				(clientState: ClientState) => this.getUpdatedClientState(clientState)
 			);
 		} else {
 			var action = this.clientStateActionCreator.update(
-				(clientState: IClientState) => this.getUpdatedClientState(clientState)
+				ClientState,
+				(clientState: ClientState) => this.getUpdatedClientState(clientState)
 			);
 		}
 		this.dispatcher.dispatch(action);
 	}
 
-	private getUpdatedClientState(clientState: IClientState) {
-		clientState = clientState.setIn(['status'], this.status);
+	private getUpdatedClientState(clientState: ClientState) {
+		clientState = clientState.setStatus(this.status);
 		return clientState;
 	}
 }

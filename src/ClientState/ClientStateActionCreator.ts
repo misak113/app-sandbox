@@ -1,13 +1,19 @@
 
 import Action from '../Flux/Action';
 import ActionCreator from '../Flux/ActionCreator';
-import IClientState from './IClientState';
 import ClientTarget from '../Addressing/ClientTarget';
-/* tslint:disable */
-var diff = require('immutablediff');
-/* tslint:enable */
+import Convertor from '../Immutable/Convertor';
+import IEntityStatic from '../Immutable/IEntityStatic';
+import {Inject} from 'di-ts';
 
+@Inject
 export default class ClientStateActionCreator extends ActionCreator<ClientStateActionName> {
+
+	constructor(
+		private convertor: Convertor
+	) {
+		super();
+	}
 
 	protected getActionName() {
 		return ClientStateActionName;
@@ -17,24 +23,49 @@ export default class ClientStateActionCreator extends ActionCreator<ClientStateA
 		return 'ClientState.ClientState';
 	}
 
-	update(updateCallback: (clientState: IClientState, clientId: string) => IClientState): Action {
-		return this.createAction(ClientStateActionName.UPDATE, updateCallback);
+	update<IClientState>(
+		ClientState: IEntityStatic<IClientState>,
+		updateCallback: (clientState: IClientState, clientId: string) => IClientState
+	) {
+		return this.createAction(ClientStateActionName.UPDATE, {
+			ClientState: ClientState,
+			updateCallback: updateCallback
+		});
 	}
 
-	updateClient(clientId: string, updateCallback: (clientState: IClientState, clientId: string) => IClientState): Action {
-		return this.createAction(ClientStateActionName.UPDATE_CLIENT, { clientId: clientId, updateCallback: updateCallback });
+	updateClient<IClientState>(
+		ClientState: IEntityStatic<IClientState>,
+		clientId: string,
+		updateCallback: (clientState: IClientState, clientId: string) => IClientState
+	) {
+		return this.createAction(ClientStateActionName.UPDATE_CLIENT, {
+			ClientState: ClientState,
+			clientId: clientId,
+			updateCallback: updateCallback
+		});
 	}
 
-	createIfNotExists(clientId: string): Action {
-		return this.createAction(ClientStateActionName.CREATE_IF_NOT_EXISTS, { clientId: clientId });
+	createIfNotExists<IClientState>(
+		ClientState: IEntityStatic<IClientState>,
+		clientId: string
+	) {
+		return this.createAction(ClientStateActionName.CREATE_IF_NOT_EXISTS, {
+			ClientState: ClientState,
+			clientId: clientId
+		});
 	}
 
-	createdIfNotExists(clientId: string) {
+	createdIfNotExists(clientId: string): Action {
 		return this.createAction(ClientStateActionName.CREATED_IF_NOT_EXISTS, { clientId: clientId });
 	}
 
-	sendDiff(originalState: IClientState, nextState: IClientState, clientId: string): Action {
-		var ops = diff(originalState, nextState);
+	sendDiff<IClientState>(
+		ClientState: IEntityStatic<IClientState>,
+		originalState: IClientState,
+		nextState: IClientState,
+		clientId: string
+	) {
+		var ops = this.convertor.diff(ClientState, originalState, nextState);
 		return this.createAction(ClientStateActionName.SEND_DIFF, ops.toJS(), new ClientTarget(clientId));
 	}
 

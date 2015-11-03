@@ -3,10 +3,10 @@ import * as React from 'react';
 import Component from '../React/Component';
 import Status from './Status';
 import ToggleButton from './ToggleButton';
-import IClientState from '../ClientState/IClientState';
+import ClientState from './ClientState';
 
 export interface IHomepageProps {
-	clientState: IClientState;
+	clientState: ClientState;
 }
 
 export default class Homepage extends Component<IHomepageProps, {}, {}> {
@@ -14,7 +14,7 @@ export default class Homepage extends Component<IHomepageProps, {}, {}> {
 	render() {
 		return (
 			<div>
-				<Status status={this.props.clientState.get('status')}/>
+				<Status status={this.props.clientState.getStatus()}/>
 				<ToggleButton/>
 			</div>
 		);

@@ -10,5 +10,5 @@ var services = require("./dist/js/src/config/services").default;
 var Server = require("./dist/js/src/Server").default;
 console.info('Starting Server');
 ReactDOMServer.renderToString(
-	React.createElement(Server, { injector: new Injector(services) })
+	React.createElement(Server, { injector: new Injector(services), ClientState: require('./dist/js/src/Demo/ClientState').default })
 );

@@ -4,13 +4,12 @@ import Dispatcher from '../Flux/Dispatcher';
 import Action from '../Flux/Action';
 import {UpdateClientStateException} from './exceptions';
 import ClientStateActionCreator, {ClientStateActionName} from './ClientStateActionCreator';
-import IClientState from './IClientState';
 import {Map} from 'immutable';
 
 @Inject
 export default class ClientStateStore {
 
-	private clientStateMap: Map<string, IClientState>;
+	private clientStateMap: Map<string, any>;
 
 	get Map() { return this.clientStateMap; }
 
@@ -33,18 +32,18 @@ export default class ClientStateStore {
 		);
 	}
 
-	getById(clientId: string) {
+	getById<IClientState>(clientId: string): IClientState {
 		return this.clientStateMap.get(clientId);
 	}
 
 	private update(action: Action) {
-		var updateCallback = action.Payload;
+		var updateCallback = action.Payload.updateCallback;
 		if (typeof updateCallback !== 'function') {
 			throw new UpdateClientStateException('Update action of clientState needs to have update callback as payload');
 		}
 		var originalClientStateMap = this.clientStateMap;
 		var nextClientStateMap = originalClientStateMap.reduce(
-			(clientStateMap: Map<string, IClientState>, originalClientState: IClientState, clientId: string) => {
+			(clientStateMap: Map<string, any>, originalClientState: any, clientId: string) => {
 				var nextClientState = updateCallback(originalClientState, clientId);
 				if (nextClientState !== originalClientState) {
 					clientStateMap = clientStateMap.set(clientId, nextClientState);
@@ -55,10 +54,15 @@ export default class ClientStateStore {
 		);
 		if (nextClientStateMap !== originalClientStateMap) {
 			this.clientStateMap = nextClientStateMap;
-			nextClientStateMap.forEach((nextClientState: IClientState, clientId: string) => {
+			nextClientStateMap.forEach((nextClientState: any, clientId: string) => {
 				var originalClientState = originalClientStateMap.get(clientId);
 				if (nextClientState !== originalClientState) {
-					this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState, clientId));
+					this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(
+						action.Payload.ClientState,
+						originalClientState,
+						nextClientState,
+						clientId
+					));
 				}
 			});
 		}
@@ -77,7 +81,12 @@ export default class ClientStateStore {
 		var nextClientState = updateCallback(originalClientState, clientId);
 		if (nextClientState !== originalClientState) {
 			this.clientStateMap = this.clientStateMap.set(clientId, nextClientState);
-			this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(originalClientState, nextClientState, clientId));
+			this.dispatcher.dispatch(this.clientStateActionCreater.sendDiff(
+				action.Payload.ClientState,
+				originalClientState,
+				nextClientState,
+				clientId
+			));
 		}
 	}
 
@@ -86,7 +95,7 @@ export default class ClientStateStore {
 		if (this.clientStateMap.has(clientId)) {
 			var clientState = this.clientStateMap.get(clientId);
 		} else {
-			var clientState = Map({});
+			var clientState = new action.Payload.ClientState();
 			this.clientStateMap = this.clientStateMap.set(clientId, clientState);
 			this.dispatcher.dispatch(this.clientStateActionCreater.created(clientId));
 		}
