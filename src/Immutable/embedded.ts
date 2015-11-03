@@ -23,5 +23,7 @@ function embedded(target: Object, propertyName: string, paramIndex?: number) {
 		EntityClass = target.constructor;
 	}
 	Reflect.defineMetadata(embedded, EmbeddedClass, EntityClass, propertyName);
+	var propertyNames: string[] = Reflect.getMetadata(embedded, EntityClass) || [];
+	Reflect.defineMetadata(embedded, propertyNames.concat([propertyName]), EntityClass);
 }
 export default embedded as ParameterDecorator & PropertyDecorator;
