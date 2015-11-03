@@ -154,13 +154,4 @@ describe('Immutable.Convertor', () => {
 		expect(user.getSkype().getNickName()).toBe('misak113');
 		expect(changedUser.getSkype().getNickName()).toBe('oleg');
 	});
-
-	/*
-	it('should not allow create entity by wrong JS object', () => {
-		var user = new User(undefined, undefined);
-		expect(() => user.fromJS({ firstNameTypo: 'Michael', lastName: 'Žabka' }))
-			.toThrow(new InvalidDirectPropertySetException(
-				'Every set property must be annotated by Property'
-			));
-	});*/
 });
