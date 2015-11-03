@@ -5,11 +5,13 @@ import embedded from './embedded';
 import Entity from './Entity';
 import {Map, List, fromJS} from 'immutable';
 import EntityStorage from './EntityStorage';
+import {Inject} from 'di-ts';
 /* tslint:disable */
 var diff = require('immutablediff');
 var patch = require('immutablepatch');
 /* tslint:enable */
 
+@Inject
 export default class Convertor {
 
 	constructor(
