@@ -1,4 +1,3 @@
-// / <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
 import IEntityStatic from './IEntityStatic';
 import { WrongReturnWhileSetProperties } from './exceptions';
@@ -84,6 +83,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 		}
 	}
 	EntityClass.prototype = OriginalEntityClass.prototype;
+	Reflect.defineMetadata(Entity, OriginalEntityClass, EntityClass);
 
 	getMethodNames(OriginalEntityClass).forEach((methodName: string) => {
 		var originalMethod = OriginalEntityClass.prototype[methodName];

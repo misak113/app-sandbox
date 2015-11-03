@@ -128,4 +128,10 @@ describe('Immutable.Entity', () => {
 				'If set properties during call method then needs to return self entity'
 			));
 	});
+
+	it('should contains reflection metadata of original Entity', () => {
+		var OriginalUser = Reflect.getMetadata(Entity, User);
+		expect(typeof OriginalUser === 'function').toBeTruthy();
+		expect(OriginalUser.prototype === User.prototype).toBeTruthy();
+	});
 });
