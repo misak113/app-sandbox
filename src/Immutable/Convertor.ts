@@ -1,12 +1,14 @@
 
 import {ArgumentIsNotImmutableEntityException} from './exceptions';
+import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';
+import Entity from './Entity';
 import {Map} from 'immutable';
 
 export default class Convertor {
 
-	convertToJS<IEntity>(entity: IEntity) {
-		var EntityClass = entity.constructor;
+	convertToJS<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, entity: IEntity) {
+		var EntityClass = this.getOriginalEntityClass(EntityClassConstructor);
 		var data: Map<string, any> = (<any>entity).data;
 		if (!(data instanceof Map)) {
 			throw new ArgumentIsNotImmutableEntityException();
@@ -15,11 +17,33 @@ export default class Convertor {
 		data.forEach((valueData: any, keyName: string) => {
 			var EmbeddedClass = Reflect.getMetadata(embedded, EntityClass, keyName);
 			if (EmbeddedClass) {
-				object[keyName] = this.convertToJS(valueData);
+				object[keyName] = this.convertToJS(EmbeddedClass, valueData);
 			} else {
 				object[keyName] = valueData;
 			}
 		});
 		return object;
+	}
+
+	convertFromJS<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, object: any): IEntity {
+		var entity = new EntityClassConstructor();
+		var EntityClass = this.getOriginalEntityClass(EntityClassConstructor);
+		var data: Map<string, any> = (<any>entity).data;
+		Object.keys(object).forEach((keyName: string) => {
+			var value = object[keyName];
+			var EmbeddedClass = Reflect.getMetadata(embedded, EntityClass, keyName);
+			if (EmbeddedClass) {
+				data = data.set(keyName, this.convertFromJS(EmbeddedClass, value));
+			} else {
+				data = data.set(keyName, value);
+			}
+		});
+		(<any>entity).data = data;
+		return entity;
+	}
+
+	private getOriginalEntityClass<IEntity>(EntityClass: IEntityStatic<IEntity>) {
+		var OriginalEntityClass = Reflect.getMetadata(Entity, EntityClass);
+		return OriginalEntityClass ? this.getOriginalEntityClass(OriginalEntityClass) : EntityClass;
 	}
 }

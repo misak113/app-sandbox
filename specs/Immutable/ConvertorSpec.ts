@@ -9,6 +9,10 @@ class Skype {
 	constructor(
 		private nickName: string
 	) {}
+
+	getNickName() {
+		return this.nickName;
+	}
 }
 
 @Entity
@@ -16,8 +20,11 @@ class Address {
 
 	constructor(
 		private street: string
-	) {}
+	) { }
 
+	getStreet() {
+		return this.street;
+	}
 }
 
 @Entity
@@ -57,7 +64,7 @@ describe('Immutable.Convertor', () => {
 		var address = new Address('Falešná');
 		var user = new User('Michael', address);
 		user = user.setSkype(skype);
-		expect(convertor.convertToJS(user)).toEqual({
+		expect(convertor.convertToJS(User, user)).toEqual({
 			name: 'Michael',
 			address: {
 				street: 'Falešná'
@@ -67,16 +74,24 @@ describe('Immutable.Convertor', () => {
 			}
 		});
 	});
-	/*
 
 	it('should return entity by JS object', () => {
-		var user = new User(undefined, undefined);
-		user = user.fromJS({ firstName: 'Michael', lastName: 'Žabka' });
+		var user = convertor.convertFromJS(User, {
+			name: 'Michael',
+			address: {
+				street: 'Falešná'
+			},
+			skype: {
+				nickName: 'misak113'
+			}
+		});
 		expect(user instanceof User).toBeTruthy();
-		expect(user.getFirstName()).toBe('Michael');
-		expect(user.getLastName()).toBe('Žabka');
+		expect(user.getName()).toBe('Michael');
+		expect(user.getAddress().getStreet()).toBe('Falešná');
+		expect(user.getSkype().getNickName()).toBe('misak113');
 	});
 
+	/*
 	it('should not allow create entity by wrong JS object', () => {
 		var user = new User(undefined, undefined);
 		expect(() => user.fromJS({ firstNameTypo: 'Michael', lastName: 'Žabka' }))
