@@ -87,8 +87,19 @@ describe('Immutable.Convertor', () => {
 		});
 		expect(user instanceof User).toBeTruthy();
 		expect(user.getName()).toBe('Michael');
+		expect(user.getAddress() instanceof Address).toBeTruthy();
 		expect(user.getAddress().getStreet()).toBe('Falešná');
+		expect(user.getSkype() instanceof Skype).toBeTruthy();
 		expect(user.getSkype().getNickName()).toBe('misak113');
+	});
+
+	it('should convert to & then from JS to be same instance', () => {
+		var skype = new Skype('misak113');
+		var address = new Address('Falešná');
+		var user = new User('Michael', address);
+		user = user.setSkype(skype);
+		var convertedUser = convertor.convertFromJS(User, convertor.convertToJS(User, user));
+		expect(convertedUser).toBe(user);
 	});
 
 	/*

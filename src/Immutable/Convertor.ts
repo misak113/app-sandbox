@@ -4,6 +4,7 @@ import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';
 import Entity from './Entity';
 import {Map} from 'immutable';
+import { storeEntity, restoreEntity } from './EntityStorage';
 
 export default class Convertor {
 
@@ -26,9 +27,8 @@ export default class Convertor {
 	}
 
 	convertFromJS<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, object: any): IEntity {
-		var entity = new EntityClassConstructor();
 		var EntityClass = this.getOriginalEntityClass(EntityClassConstructor);
-		var data: Map<string, any> = (<any>entity).data;
+		var data: Map<string, any> = Map({});
 		Object.keys(object).forEach((keyName: string) => {
 			var value = object[keyName];
 			var EmbeddedClass = Reflect.getMetadata(embedded, EntityClass, keyName);
@@ -38,7 +38,12 @@ export default class Convertor {
 				data = data.set(keyName, value);
 			}
 		});
-		(<any>entity).data = data;
+		var entity = restoreEntity(EntityClass, data);
+		if (entity === null) {
+			entity = new EntityClassConstructor();
+			(<any>entity).data = data;
+			storeEntity(EntityClass, entity);
+		}
 		return entity;
 	}
 
