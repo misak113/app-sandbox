@@ -1,6 +1,7 @@
 
 import Convertor from '../../src/Immutable/Convertor';
-import Entity from '../../src/Immutable/Entity';
+import Entity, { setEntityStorage } from '../../src/Immutable/Entity';
+import EntityStorage from '../../src/Immutable/EntityStorage';
 import embedded from '../../src/Immutable/embedded';
 
 @Entity
@@ -57,7 +58,12 @@ class User {
 
 describe('Immutable.Convertor', () => {
 
-	var convertor = new Convertor();
+	var entityStorage = new EntityStorage();
+	var convertor = new Convertor(entityStorage);
+
+	beforeEach(() => {
+		setEntityStorage(entityStorage);
+	});
 
 	it('should return JS object of entity', () => {
 		var skype = new Skype('misak113');

@@ -4,9 +4,13 @@ import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';
 import Entity from './Entity';
 import {Map} from 'immutable';
-import { restoreEntity } from './EntityStorage';
+import EntityStorage from './EntityStorage';
 
 export default class Convertor {
+
+	constructor(
+		private entityStorage: EntityStorage
+	) {}
 
 	convertToJS<IEntity>(EntityClassConstructor: IEntityStatic<IEntity>, entity: IEntity) {
 		var EntityClass = this.getOriginalEntityClass(EntityClassConstructor);
@@ -38,7 +42,7 @@ export default class Convertor {
 				data = data.set(keyName, value);
 			}
 		});
-		var entity = restoreEntity(EntityClass, data);
+		var entity = this.entityStorage.restoreEntity<IEntity>(EntityClass, data);
 		if (entity === null) {
 			entity = new EntityClassConstructor();
 			(<any>entity).data = data;

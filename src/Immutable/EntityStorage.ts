@@ -2,27 +2,25 @@
 import IEntityStatic from './IEntityStatic';
 import { Map } from 'immutable';
 
-var entityStorage: Map<IEntityStatic<any>, Map<Map<string, any>, any>>;
+export type Data = Map<string, any>;
+export type EntityByData<IEntity> = Map<Data, IEntity>;
 
-var storeEntity = (OriginalEntityClass: IEntityStatic<any>, entity: any) => {
-	if (!entityStorage) {
-		entityStorage = Map<IEntityStatic<any>, Map<Map<string, any>, any>>();
-	}
-	if (!entityStorage.has(OriginalEntityClass)) {
-		entityStorage = entityStorage.set(OriginalEntityClass, Map<Map<string, any>, any>());
-	}
-	entityStorage = entityStorage.setIn([OriginalEntityClass, entity.data], entity);
-};
+export default class EntityStorage {
 
-var restoreEntity = (OriginalEntityClass: IEntityStatic<any>, data: Map<string, any>) => {
-	if (entityStorage && entityStorage.hasIn([OriginalEntityClass, data])) {
-		return entityStorage.getIn([OriginalEntityClass, data]);
-	} else {
-		return null;
-	}
-};
+	private entityStorage = Map<IEntityStatic<any>, EntityByData<any>>({});
 
-export {
-	storeEntity,
-	restoreEntity
-};
+	storeEntity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>, entity: IEntity) {
+		if (!this.entityStorage.has(OriginalEntityClass)) {
+			this.entityStorage = this.entityStorage.set(OriginalEntityClass, Map<Data, any>());
+		}
+		this.entityStorage = this.entityStorage.setIn([OriginalEntityClass, (<any>entity).data], entity);
+	};
+
+	restoreEntity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>, data: Data): IEntity {
+		if (this.entityStorage.hasIn([OriginalEntityClass, data])) {
+			return this.entityStorage.getIn([OriginalEntityClass, data]);
+		} else {
+			return null;
+		}
+	}
+}

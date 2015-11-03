@@ -1,5 +1,6 @@
 
-import Entity from '../../src/Immutable/Entity';
+import Entity, { setEntityStorage } from '../../src/Immutable/Entity';
+import EntityStorage from '../../src/Immutable/EntityStorage';
 import { WrongReturnWhileSetProperties } from '../../src/Immutable/exceptions';
 
 describe('Immutable.Entity', () => {
@@ -63,6 +64,12 @@ describe('Immutable.Entity', () => {
 			this.lastName = lastName;
 		}
 	}
+
+	var entityStorage = new EntityStorage();
+
+	beforeEach(() => {
+		setEntityStorage(entityStorage);
+	});
 
 	it('should get properties set in constructor', () => {
 		var user = new User('Michael', 'Žabka');

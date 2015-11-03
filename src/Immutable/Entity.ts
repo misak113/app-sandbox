@@ -1,8 +1,23 @@
 
 import IEntityStatic from './IEntityStatic';
-import { WrongReturnWhileSetProperties } from './exceptions';
+import { WrongReturnWhileSetProperties, NotEntityStorageWasSetException } from './exceptions';
 import { Map } from 'immutable';
-import { storeEntity, restoreEntity } from './EntityStorage';
+import EntityStorage from './EntityStorage';
+
+var localEntityStorage: EntityStorage;
+
+export function setEntityStorage(entityStorage: EntityStorage) {
+	'use strict';
+	localEntityStorage = entityStorage;
+}
+
+export function getEntityStorage() {
+	'use strict';
+	if (!localEntityStorage) {
+		throw new NotEntityStorageWasSetException();
+	}
+	return localEntityStorage;
+}
 
 var getMethodNames = (OriginalEntityClass: IEntityStatic<any>) => {
 	var methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
@@ -34,18 +49,18 @@ var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
 	return proxyEntity;
 };
 
+var getOrCreateEntity = (OriginalEntityClass: IEntityStatic<any>, EntityClass: any, data: Map<string, any>) => {
+	var nextEntity = getEntityStorage().restoreEntity<any>(OriginalEntityClass, data);
+	if (!nextEntity) {
+		nextEntity = new EntityClass();
+		nextEntity.data = data;
+		getEntityStorage().storeEntity(OriginalEntityClass, nextEntity);
+	}
+	return nextEntity;
+};
+
 function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 	'use strict';
-
-	var getOrCreateEntity = (data: Map<string, any>) => {
-		var nextEntity = restoreEntity(OriginalEntityClass, data);
-		if (!nextEntity) {
-			nextEntity = new EntityClass();
-			nextEntity.data = data;
-			storeEntity(OriginalEntityClass, nextEntity);
-		}
-		return nextEntity;
-	};
 
 	class EntityProxy { }
 
@@ -60,7 +75,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 			Object.keys(proxyEntity).forEach((propertyKey: string) => {
 				this.data = this.data.set(propertyKey, proxyEntity[propertyKey]);
 			});
-			storeEntity(OriginalEntityClass, this);
+			getEntityStorage().storeEntity<IEntity>(OriginalEntityClass, <IEntity><any>this);
 		}
 	}
 	EntityClass.prototype = OriginalEntityClass.prototype;
@@ -90,7 +105,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 							data = data.set(propertyKey, propertyValue);
 						});
 						if (data !== originalEntity.data) {
-							return getOrCreateEntity(data);
+							return getOrCreateEntity(OriginalEntityClass, EntityClass, data);
 						} else {
 							return originalEntity;
 						}
