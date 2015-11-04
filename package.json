@@ -14,7 +14,10 @@
     "type": "git",
     "url": "git+https://github.com/misak113/app-sandbox.git"
   },
-  "license": "ISC",
+  "license": [
+    "FreeBSD",
+    "GPL-2.0"
+  ],
   "homepage": "https://github.com/misak113/app-sandbox#readme",
   "dependencies": {
     "cookie": "^0.2.2",
