@@ -8,10 +8,10 @@ describe('Flux.Action', () => {
 			'My.Namespace:NAME'
 		);
 		expect(action instanceof Action).toBeTruthy();
-		expect(action.Name).toBe('My.Namespace:NAME');
-		expect(action.Payload).toBeUndefined();
-		expect(action.Source).toBeUndefined();
-		expect(action.Target).toBeUndefined();
+		expect(action.getName()).toBe('My.Namespace:NAME');
+		expect(action.getPayload()).toBeUndefined();
+		expect(action.getSource()).toBeUndefined();
+		expect(action.getTarget()).toBeUndefined();
 	});
 
 	it('should create instance of Action with optional properties', () => {
@@ -22,11 +22,11 @@ describe('Flux.Action', () => {
 			{ targetType: 'Server', serverId: 'Shard1' }
 		);
 		expect(action instanceof Action).toBeTruthy();
-		expect(action.Name).toBe('My.Namespace:NAME');
-		expect(action.Payload).toEqual({ whatever: 'you want' });
-		expect(action.Source.sourceType).toBe('Client');
-		expect(action.Source.clientId).toBe('Client1');
-		expect(action.Target.targetType).toBe('Server');
-		expect(action.Target.serverId).toBe('Shard1');
+		expect(action.getName()).toBe('My.Namespace:NAME');
+		expect(action.getPayload()).toEqual({ whatever: 'you want' });
+		expect(action.getSource().sourceType).toBe('Client');
+		expect(action.getSource().clientId).toBe('Client1');
+		expect(action.getTarget().targetType).toBe('Server');
+		expect(action.getTarget().serverId).toBe('Shard1');
 	});
 });

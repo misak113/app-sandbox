@@ -1,18 +1,20 @@
 
 import Action from './Action';
-import ActionNameStatic from './ActionNameStatic';
+import EnumStatic from './EnumStatic';
 
-abstract class ActionCreator<ActionName extends ActionNameStatic<any>> {
+abstract class ActionCreator<ActionName extends EnumStatic<any>> {
 
-	protected abstract getActionName(): ActionNameStatic<ActionName>;
-	protected abstract getName(): string;
+	constructor(
+		private name: string,
+		private ActionNameStatic: EnumStatic<ActionName>
+	) {}
 
 	protected createAction(actionName: ActionName, payload?: any, target?: any, source?: any) {
 		return new Action(this.createActionName(actionName), payload, source, target);
 	}
 
-	createActionName(actionName: ActionName) {
-		return this.getName() + ':' + this.getActionName()[<any>actionName];
+	private createActionName(actionName: ActionName) {
+		return this.name + ':' + this.ActionNameStatic[<any>actionName];
 	}
 }
 export default ActionCreator;

@@ -4,14 +4,10 @@ import ActionCreator from '../../src/Flux/ActionCreator';
 
 describe('Flux.ActionCreator', () => {
 
-	class MyActionCreator extends ActionCreator<MyActionName> {
+	class MyActions extends ActionCreator<MyActionName> {
 
-		protected getActionName() {
-			return MyActionName;
-		}
-
-		protected getName() {
-			return 'Flux.My';
+		constructor() {
+			super('Flux.My', MyActionName);
 		}
 
 		lets() {
@@ -33,32 +29,32 @@ describe('Flux.ActionCreator', () => {
 		IT
 	}
 
-	var myActionCreator = new MyActionCreator();
+	var myActions = new MyActions();
 
 	it('should return action name prefixed by ActionCreator name', () => {
-		expect(myActionCreator.createActionName(MyActionName.LETS)).toBe('Flux.My:LETS');
-		expect(myActionCreator.createActionName(MyActionName.TRY)).toBe('Flux.My:TRY');
-		expect(myActionCreator.createActionName(MyActionName.IT)).toBe('Flux.My:IT');
+		expect(myActions.lets().getName()).toBe('Flux.My:LETS');
+		expect(myActions.try('done').getName()).toBe('Flux.My:TRY');
+		expect(myActions.it('did', 'source').getName()).toBe('Flux.My:IT');
 	});
 
 	it('should return action instance', () => {
-		var letsAction = myActionCreator.lets();
+		var letsAction = myActions.lets();
 		expect(letsAction instanceof Action).toBeTruthy();
-		expect(letsAction.Name).toBe('Flux.My:LETS');
-		expect(letsAction.Payload).toEqual({ do: 'it' });
+		expect(letsAction.getName()).toBe('Flux.My:LETS');
+		expect(letsAction.getPayload()).toEqual({ do: 'it' });
 
-		var tryAction = myActionCreator.try('you');
+		var tryAction = myActions.try('you');
 		expect(tryAction instanceof Action).toBeTruthy();
-		expect(tryAction.Name).toBe('Flux.My:TRY');
-		expect(tryAction.Payload).toEqual({ done: 'you' });
-		expect(tryAction.Source).toBe('you');
-		expect(tryAction.Target).toBe('he');
+		expect(tryAction.getName()).toBe('Flux.My:TRY');
+		expect(tryAction.getPayload()).toEqual({ done: 'you' });
+		expect(tryAction.getSource()).toBe('you');
+		expect(tryAction.getTarget()).toBe('he');
 
-		var itAction = myActionCreator.it('me', 'you');
+		var itAction = myActions.it('me', 'you');
 		expect(itAction instanceof Action).toBeTruthy();
-		expect(itAction.Name).toBe('Flux.My:IT');
-		expect(itAction.Payload).toEqual({ did: 'me' });
-		expect(itAction.Source).toBe('me');
-		expect(itAction.Target).toBe('you');
+		expect(itAction.getName()).toBe('Flux.My:IT');
+		expect(itAction.getPayload()).toEqual({ did: 'me' });
+		expect(itAction.getSource()).toBe('me');
+		expect(itAction.getTarget()).toBe('you');
 	});
 });

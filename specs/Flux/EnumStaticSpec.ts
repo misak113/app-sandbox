@@ -1,7 +1,7 @@
 
-import ActionNameStatic from '../../src/Flux/ActionNameStatic';
+import EnumStatic from '../../src/Flux/EnumStatic';
 
-describe('Flux.ActionNameStatic', () => {
+describe('Flux.EnumStatic', () => {
 
 	enum MyActionName {
 		WHAT,
@@ -9,13 +9,13 @@ describe('Flux.ActionNameStatic', () => {
 	}
 
 	it('should allow to store enum ActionName static to type ActionNameStatic', () => {
-		var actionNameStatic: ActionNameStatic<MyActionName> = MyActionName;
+		var actionNameStatic: EnumStatic<MyActionName> = MyActionName;
 		// enum has length doubled because of convertion both side string <-> number
 		expect(Object.keys(actionNameStatic).length).toBe(4);
 	});
 
 	it('should allow to get enum ActionName value from ActionNameStatic type', () => {
-		var actionNameStatic: ActionNameStatic<MyActionName> = MyActionName;
+		var actionNameStatic: EnumStatic<MyActionName> = MyActionName;
 
 		var whatValue1 = actionNameStatic[MyActionName.WHAT];
 		expect(whatValue1).toBe('WHAT');

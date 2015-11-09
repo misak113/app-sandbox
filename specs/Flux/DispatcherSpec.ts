@@ -1,6 +1,7 @@
 
 import Dispatcher from '../../src/Flux/Dispatcher';
 import Action from '../../src/Flux/Action';
+import Signal from '../../src/Flux/Signal';
 import {FluxDispatcherUnbindException} from '../../src/Flux/exceptions';
 
 describe('Flux.Dispatcher', () => {
@@ -9,14 +10,14 @@ describe('Flux.Dispatcher', () => {
 		var countOfExecutionOne = 0;
 		var countOfExecutionTwo = 0;
 		var dispatcher = new Dispatcher();
-		dispatcher.bind('MyName', (action: Action) => {
-			expect(action.Name).toBe('MyName');
-			expect(action.Payload).toBe('MyPayload');
-			expect(action.Source).toBe('MySource');
-			expect(action.Target).toBe('MyTarget');
+		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
+			expect(action.getName()).toBe('MyName');
+			expect(action.getPayload()).toBe('MyPayload');
+			expect(action.getSource()).toBe('MySource');
+			expect(action.getTarget()).toBe('MyTarget');
 			countOfExecutionOne++;
 		});
-		dispatcher.bind('MyName', (action: Action) => {
+		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionTwo++;
 		});
 		dispatcher.dispatch(new Action('MyName', 'MyPayload', 'MySource', 'MyTarget'));
@@ -32,10 +33,10 @@ describe('Flux.Dispatcher', () => {
 		var countOfExecutionOne = 0;
 		var countOfExecutionTwo = 0;
 		var dispatcher = new Dispatcher();
-		dispatcher.bind('MyName', (action: Action) => {
+		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
-		dispatcher.bind('AnotherName', (action: Action) => {
+		dispatcher.bind(new Signal('AnotherName'), (action: Action<any>) => {
 			countOfExecutionTwo++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -51,10 +52,10 @@ describe('Flux.Dispatcher', () => {
 		var countOfExecutionOne = 0;
 		var countOfExecutionTwo = 0;
 		var dispatcher = new Dispatcher();
-		dispatcher.bind('MyName', (action: Action) => {
+		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
-		dispatcher.bind('*', (action: Action) => {
+		dispatcher.bind(new Signal('*'), (action: Action<any>) => {
 			countOfExecutionTwo++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -75,13 +76,13 @@ describe('Flux.Dispatcher', () => {
 		dispatcher.dispatch(new Action('MyName'));
 		dispatcher.dispatch(new Action('OtherName'));
 		dispatcher.dispatch(new Action('AnotherNotBindedDirectly'));
-		dispatcher.bind('MyName', (action: Action) => {
+		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
-		dispatcher.bind('OtherName', (action: Action) => {
+		dispatcher.bind(new Signal('OtherName'), (action: Action<any>) => {
 			countOfExecutionTwo++;
 		});
-		dispatcher.bind('*', (action: Action) => {
+		dispatcher.bind(new Signal('*'), (action: Action<any>) => {
 			countOfExecutionThree++;
 		});
 		// wait 1 tick
@@ -98,15 +99,15 @@ describe('Flux.Dispatcher', () => {
 		var countOfExecutionTwo = 0;
 		var countOfExecutionThree = 0;
 		var dispatcher = new Dispatcher();
-		dispatcher.bind(['MyName', 'OtherName'], (action: Action) => {
-			if (action.Name === 'MyName') {
+		dispatcher.bind([new Signal('MyName'), new Signal('OtherName')], (action: Action<any>) => {
+			if (action.getName() === 'MyName') {
 				countOfExecutionOne++;
 			}
-			if (action.Name === 'OtherName') {
+			if (action.getName() === 'OtherName') {
 				countOfExecutionTwo++;
 			}
 		});
-		dispatcher.bind('*', (action: Action) => {
+		dispatcher.bind(new Signal('*'), (action: Action<any>) => {
 			countOfExecutionThree++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -124,7 +125,7 @@ describe('Flux.Dispatcher', () => {
 	it('should unbind binded callbacks', (done: Function) => {
 		var countOfExecutionOne = 0;
 		var dispatcher = new Dispatcher();
-		var oneActionBinding = dispatcher.bind('MyName', (action: Action) => {
+		var oneActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -145,11 +146,11 @@ describe('Flux.Dispatcher', () => {
 		var countOfExecutionOne = 0;
 		var countOfExecutionTwo = 0;
 		var dispatcher = new Dispatcher();
-		var bothActionBinding = dispatcher.bind(['MyName', 'OtherName'], (action: Action) => {
-			if (action.Name === 'MyName') {
+		var bothActionBinding = dispatcher.bind([new Signal('MyName'), new Signal('OtherName')], (action: Action<any>) => {
+			if (action.getName() === 'MyName') {
 				countOfExecutionOne++;
 			}
-			if (action.Name === 'OtherName') {
+			if (action.getName() === 'OtherName') {
 				countOfExecutionTwo++;
 			}
 		});
@@ -174,7 +175,7 @@ describe('Flux.Dispatcher', () => {
 	it('should unbind asterisk * binded callback', (done: Function) => {
 		var countOfExecutionOne = 0;
 		var dispatcher = new Dispatcher();
-		var asteriskActionBinding = dispatcher.bind('*', (action: Action) => {
+		var asteriskActionBinding = dispatcher.bind(new Signal('*'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -196,7 +197,7 @@ describe('Flux.Dispatcher', () => {
 	it('should throw exception if unbind more than once', (done: Function) => {
 		var countOfExecutionOne = 0;
 		var dispatcher = new Dispatcher();
-		var asteriskActionBinding = dispatcher.bind('MyName', (action: Action) => {
+		var asteriskActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -205,7 +206,7 @@ describe('Flux.Dispatcher', () => {
 			expect(countOfExecutionOne).toBe(1);
 			dispatcher.unbind(asteriskActionBinding);
 			expect(() => dispatcher.unbind(asteriskActionBinding))
-				.toThrow(new FluxDispatcherUnbindException('Try to unbind not binded ActionBinding'));
+				.toThrow(new FluxDispatcherUnbindException('Try to unbind not binded Binding'));
 			done();
 		});
 	});
