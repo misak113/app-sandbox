@@ -1,13 +1,14 @@
 
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
-import Action from '../Flux/Action';
-import StatusActionCreator, {StatusActionName} from './StatusActionCreator';
-import ClientStateActionCreator, {ClientStateActionName} from '../ClientState/ClientStateActionCreator';
-import ClientState from './ClientState';
+import { StatusSignals } from './Status';
+import { StateActions } from '../State/State';
+import HomepageState from './HomepageState';
+import ResourceFactory from '../Addressing/ResourceFactory';
+import Store from '../Flux/Store';
 
 @Inject
-export default class StatusStore {
+export default class StatusStore extends Store<HomepageState> {
 
 	private status: boolean;
 
@@ -15,39 +16,30 @@ export default class StatusStore {
 
 	constructor(
 		private dispatcher: Dispatcher,
-		private statusActionCreater: StatusActionCreator,
-		private clientStateActionCreator: ClientStateActionCreator
+		private statusSignals: StatusSignals,
+		private stateActions: StateActions,
+		private resourceFactory: ResourceFactory
 	) {
-		this.dispatcher.bind(this.statusActionCreater.createActionName(StatusActionName.CHANGE_STATUS), () => this.changeStatus());
-		this.dispatcher.bind(
-			this.clientStateActionCreator.createActionName(ClientStateActionName.CREATED),
-			(action: Action) => this.update(action.Payload.clientId)
-		);
+		super(HomepageState);
+		this.dispatcher.bind(this.statusSignals.changeStatus(), () => this.changeStatus());
+	}
+
+	getState(params: { [name: string]: string }) {
+		var state = new HomepageState();
+		state = state.setStatus(this.status);
+		return state;
 	}
 
 	private changeStatus() {
+		var resourceTarget = this.resourceFactory.get(StatusStore, {});
+		var originalState = this.getState({});
 		this.status = !this.status;
-		this.update();
-	}
-
-	private update(clientId?: string) {
-		if (clientId) {
-			var action = this.clientStateActionCreator.updateClient(
-				ClientState,
-				clientId,
-				(clientState: ClientState) => this.getUpdatedClientState(clientState)
-			);
-		} else {
-			var action = this.clientStateActionCreator.update(
-				ClientState,
-				(clientState: ClientState) => this.getUpdatedClientState(clientState)
-			);
-		}
-		this.dispatcher.dispatch(action);
-	}
-
-	private getUpdatedClientState(clientState: ClientState) {
-		clientState = clientState.setStatus(this.status);
-		return clientState;
+		var nextState = this.getState({});
+		this.dispatcher.dispatch(this.stateActions.update(
+			HomepageState,
+			originalState,
+			nextState,
+			resourceTarget
+		));
 	}
 }

@@ -1,20 +1,16 @@
 
 import * as React from 'react';
-import Component from '../../React/Component';
-import ClientState from '../ClientState';
 import User from './User';
 /* tslint:disable */
 var Link = require('react-router').Link;
 /* tslint:enable */
 
-export interface IUsersPageProps {
-	clientState: ClientState;
-}
+export interface IUsersPageProps {}
 
-export default class UsersPage extends Component<IUsersPageProps, {}, {}> {
+export default class UsersPage extends React.Component<IUsersPageProps, {}> {
 
 	render() {
-		var userList = this.props.clientState.getUserList();
+		var userList = null;
 		if (!userList) {
 			return <div>Loading...</div>;
 		}

@@ -2,6 +2,7 @@
 import {Inject} from 'di-ts';
 import ClientSocket from './ClientSocket';
 import Action from '../Flux/Action';
+import AnySignal from '../Flux/AnySignal';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
 import ServerSource from '../Addressing/ServerSource';
@@ -19,8 +20,8 @@ export default class ClientDispatcher {
 		var socket = this.socket.getSocketOf(this.namespace.value);
 		socket.on('connect', () => {
 			socket.emit('clientId', clientId);
-			this.bind(socket);
 		});
+		this.bind(socket);
 	}
 
 	private bind(socket: SocketIOClient.Socket) {
@@ -28,9 +29,9 @@ export default class ClientDispatcher {
 			var action = new Action(name, payload, new ServerSource());
 			this.dispatcher.dispatch(action);
 		});
-		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
-			if (!(action.Source instanceof ServerSource)) {
-				socket.emit('action', action.Name, action.Payload);
+		var actionBinding = this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
+			if (!(action.getSource() instanceof ServerSource)) {
+				socket.emit('action', action.getName(), action.getPayload());
 			}
 		});
 		socket.on('disconnect', () => {

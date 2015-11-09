@@ -38,6 +38,7 @@ export default function DefaultContext(contextStatic: any): ClassDecorator {
 						ComponentStatic.contextTypes[key] = PropTypes.any.isRequired;
 					}
 					context[key] = this.context[key];
+					ComponentWithContext.childContextTypes[key] = PropTypes.any.isRequired;
 				});
 				return context;
 			}

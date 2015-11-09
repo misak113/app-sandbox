@@ -2,7 +2,7 @@
 import Entity from '../Immutable/Entity';
 
 @Entity
-export default class ClientState {
+export default class HomepageState {
 
 	private status: boolean;
 
@@ -13,9 +13,5 @@ export default class ClientState {
 	setStatus(status: boolean) {
 		this.status = status;
 		return this;
-	}
-
-	getUserList() {
-		return null;
 	}
 }

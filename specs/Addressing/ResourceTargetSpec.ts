@@ -1,11 +1,11 @@
 
-import ClientTarget from '../../src/Addressing/ClientTarget';
+import ClientTarget from '../../src/Addressing/ResourceTarget';
 
-describe('Addressing.ClientTarget', () => {
+describe('Addressing.ResourceTarget', () => {
 
 	it('shoud return instance with id property', () => {
 		var clientTarget = new ClientTarget('abc113');
 		expect(clientTarget instanceof ClientTarget).toBeTruthy();
-		expect(clientTarget.Id).toBe('abc113');
+		expect(clientTarget.getIdentifier()).toBe('abc113');
 	});
 });

@@ -2,7 +2,7 @@
 import Entity from '../../src/Immutable/Entity';
 
 @Entity
-export default class ClientState {
+export default class MyState {
 
 	[name: string]: any;
 
