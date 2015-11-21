@@ -2,6 +2,7 @@
 import * as React from 'react';
 import Component from '../React/Component';
 import DefaultContext from '../React/DefaultContext';
+import DefaultProps from '../React/DefaultProps';
 import {Request, Response} from 'express';
 import {Inject} from 'di-ts';
 import {Injector} from 'di';
@@ -74,8 +75,9 @@ export default class Router extends Component<{}, {}, RouterContext> {
 			const clientId = this.getClientId(request);
 			const Component = renderProps.components[renderProps.components.length - 1]; // TODO
 			var initialState;
-			if (stores.has(Component)) {
-				const store = this.context.injector.get<Store<any>>(stores.get(Component));
+			var StateStatic = Reflect.getMetadata(DefaultProps, Component);
+			if (stores.has(StateStatic)) {
+				const store = this.context.injector.get<Store<any>>(stores.get(StateStatic));
 				const params = renderProps.params;
 				const state = store.getState(params);
 				const State = store.getStateClass();

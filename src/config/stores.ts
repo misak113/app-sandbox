@@ -2,11 +2,11 @@
 import {Map} from 'immutable';
 import Store from '../Flux/Store';
 import IClassStatic from '../Flux/IClassStatic';
-import Homepage from '../Demo/Homepage';
+import HomepageState from '../Demo/HomepageState';
 import StatusStore from '../Demo/StatusStore';
 
 let stores = Map<any, IClassStatic<Store<any>>>();
 
-stores = stores.set(Homepage, StatusStore);
+stores = stores.set(HomepageState, StatusStore);
 
 export default stores;
