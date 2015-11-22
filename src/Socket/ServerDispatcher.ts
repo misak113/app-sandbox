@@ -7,7 +7,7 @@ import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
 import ClientSource from '../Addressing/ClientSource';
 import ResourceTarget from '../Addressing/ResourceTarget';
-import { StateSignals, ISubscribePayload } from '../State/State';
+import { StateSignals, ISubscribePayload, IUnsubscribePayload } from '../State/State';
 import { Map } from 'immutable';
 
 @Inject
@@ -25,6 +25,10 @@ export default class ServerDispatcher {
 			this.stateSignals.subscribe(),
 			(action: Action<ISubscribePayload>) => this.subscribe(action)
 		);
+		this.dispatcher.bind(
+			this.stateSignals.unsubscribe(),
+			(action: Action<IUnsubscribePayload>) => this.unsubscribe(action)
+		);
 	}
 
 	private subscribe(action: Action<ISubscribePayload>) {
@@ -35,8 +39,18 @@ export default class ServerDispatcher {
 		if (!socket) {
 			throw new Error(); // TODO
 		}
-		socket.leaveAll();
 		socket.join(action.getPayload().identifier);
+	}
+
+	private unsubscribe(action: Action<IUnsubscribePayload>) {
+		if (!(action.getSource() instanceof ClientSource)) {
+			throw new Error(); // TODO
+		}
+		var socket = this.socketMap.get(action.getSource().getId());
+		if (!socket) {
+			throw new Error(); // TODO
+		}
+		socket.leave(action.getPayload().identifier);
 	}
 
 	listen() {

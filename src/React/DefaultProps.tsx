@@ -22,7 +22,7 @@ export class Context {
 	) { }
 }
 
-export default function DefaultProps(StateStatic: any): ClassDecorator {
+export default function DefaultProps(StatesStatic: { [stateName: string]: any }): ClassDecorator {
 	'use strict';
 	return (ComponentStatic: React.ComponentClass<any>) => {
 		@DefaultContext(Context)
@@ -33,41 +33,56 @@ export default function DefaultProps(StateStatic: any): ClassDecorator {
 			};
 
 			context: Context;
-			private patchBinding: Binding<IPatchPayload>;
+			private patchBindings: Binding<IPatchPayload>[];
 
 			constructor(props: any, context: any) {
 				super(props, context);
-				this.state = {
-					defaultProps: this.context.initialState
-				};
+				this.state = {};
+				Object.keys(StatesStatic).forEach((stateName: string) => {
+					var StateStatic = StatesStatic[stateName];
+					this.state[stateName] = this.context.convertor.convertFromJS(
+						StateStatic,
+						this.context.initialState[stateName]
+					);
+				});
 			}
 
 			componentDidMount() {
-				var resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);
-				this.context.dispatcher.dispatch(this.context.stateActions.subscribe(resourceTarget));
-				this.patchBinding = this.context.dispatcher.bind(
-					this.context.stateSignals.patch(),
-					(action: Action<IPatchPayload>) => {
-						var nextState = this.context.convertor.patch(
-							StateStatic,
-							this.state.defaultProps,
-							fromJS(action.getPayload())
-						);
-						this.setState({ defaultProps: nextState });
-					}
-				);
+				this.patchBindings = Object.keys(StatesStatic).map((stateName: string) => {
+					var StateStatic = StatesStatic[stateName];
+					var resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);
+					this.context.dispatcher.dispatch(this.context.stateActions.subscribe(resourceTarget));
+					return this.context.dispatcher.bind(
+						this.context.stateSignals.patch(resourceTarget),
+						(action: Action<IPatchPayload>) => {
+							var nextState = this.context.convertor.patch(
+								StateStatic,
+								this.state[stateName],
+								fromJS(action.getPayload())
+							);
+							this.setState({ [stateName]: nextState });
+						}
+					);
+				});
 			}
 
-			componentWillUmount() {
-				this.context.dispatcher.unbind(this.patchBinding);
+			componentWillUnmount() {
+				this.patchBindings.forEach((patchBinding: Binding<IPatchPayload>) => {
+					this.context.dispatcher.unbind(patchBinding);
+				});
+				Object.keys(StatesStatic).forEach((stateName: string) => {
+					var StateStatic = StatesStatic[stateName];
+					var resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);
+					this.context.dispatcher.dispatch(this.context.stateActions.unsubscribe(resourceTarget));
+				});
 			}
 
 			render() {
-				return <ComponentStatic {...this.state.defaultProps} {...this.props}/>;
+				return <ComponentStatic {...this.state} {...this.props}/>;
 			}
 		}
-		Reflect.defineMetadata(DefaultProps, StateStatic, ComponentStatic);
-		Reflect.defineMetadata(DefaultProps, StateStatic, ComponentWithProps);
+		Reflect.defineMetadata(DefaultProps, StatesStatic, ComponentStatic);
+		Reflect.defineMetadata(DefaultProps, StatesStatic, ComponentWithProps);
 		return ComponentWithProps as any as React.ComponentClass<any>;
 	};
 }

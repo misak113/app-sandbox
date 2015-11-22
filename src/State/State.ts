@@ -14,6 +14,7 @@ const name = 'State.State';
 export enum State {
 	patch,
 	subscribe,
+	unsubscribe,
 	update
 }
 
@@ -35,6 +36,10 @@ export class StateActions extends ActionCreator<State> {
 		return this.createAction(State.subscribe, { identifier: resourceTarget.getIdentifier() });
 	}
 
+	unsubscribe(resourceTarget: ResourceTarget): Action<ISubscribePayload> {
+		return this.createAction(State.unsubscribe, { identifier: resourceTarget.getIdentifier() });
+	}
+
 	update<S>(S: IClassStatic<S>, originalState: S, nextState: S, resource: ResourceTarget): Action<IUpdatePayload> {
 		return this.createAction(State.update, {
 			StateClass: S,
@@ -50,12 +55,16 @@ export class StateSignals extends SignalCreator<State> {
 		super(name, State);
 	}
 
-	patch(): Signal<{}> {
-		return this.createSignal(State.patch);
+	patch(resourceTarget: ResourceTarget): Signal<{}> {
+		return this.createSignal(State.patch, resourceTarget.getIdentifier());
 	}
 
 	subscribe() {
 		return this.createSignal(State.subscribe);
+	}
+
+	unsubscribe() {
+		return this.createSignal(State.unsubscribe);
 	}
 
 	update(): Signal<{}> {
@@ -66,6 +75,10 @@ export class StateSignals extends SignalCreator<State> {
 export type IPatchPayload = any[];
 
 export interface ISubscribePayload {
+	identifier: string;
+}
+
+export interface IUnsubscribePayload {
 	identifier: string;
 }
 

@@ -5,17 +5,19 @@ import ToggleButton from './ToggleButton';
 import HomepageState from './HomepageState';
 import DefaultProps from '../React/DefaultProps';
 
-export interface IHomepageProps extends HomepageState {
-	params: { [name: string]: string };
+export interface IHomepageProps {
+	homepage: HomepageState;
 }
 
-@DefaultProps(HomepageState)
+@DefaultProps({
+	homepage: HomepageState
+})
 export default class Homepage extends React.Component<IHomepageProps, {}> {
 
 	render() {
 		return (
 			<div>
-				<StatusView status={this.props.getStatus() }/>
+				<StatusView status={this.props.homepage.getStatus() }/>
 				<ToggleButton/>
 			</div>
 		);

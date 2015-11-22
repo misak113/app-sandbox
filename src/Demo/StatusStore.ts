@@ -31,7 +31,7 @@ export default class StatusStore extends Store<HomepageState> {
 	}
 
 	private changeStatus() {
-		var resourceTarget = this.resourceFactory.get(StatusStore, {});
+		var resourceTarget = this.resourceFactory.get(HomepageState, {});
 		var originalState = this.getState({});
 		this.status = !this.status;
 		var nextState = this.getState({});

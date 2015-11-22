@@ -74,15 +74,16 @@ export default class Router extends Component<{}, {}, RouterContext> {
 			const totalTime = process.hrtime(startTime);
 			const clientId = this.getClientId(request);
 			const Component = renderProps.components[renderProps.components.length - 1]; // TODO
-			var initialState;
-			var StateStatic = Reflect.getMetadata(DefaultProps, Component);
-			if (stores.has(StateStatic)) {
+			var initialState: { [stateName: string]: any } = {};
+			var StatesStatic = Reflect.getMetadata(DefaultProps, Component);
+			Object.keys(StatesStatic).map((stateName: string) => {
+				var StateStatic = StatesStatic[stateName];
 				const store = this.context.injector.get<Store<any>>(stores.get(StateStatic));
 				const params = renderProps.params;
 				const state = store.getState(params);
 				const State = store.getStateClass();
-				initialState = this.context.convertor.convertToJS(State, state);
-			}
+				initialState[stateName] = this.context.convertor.convertToJS(State, state);
+			});
 
 			class Client extends React.Component<{}, {}> {
 
