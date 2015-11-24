@@ -14,4 +14,12 @@ export default class ResourceFactory {
 		}
 		return new ResourceTarget(name + ':' + JSON.stringify(params)); // TODO
 	}
+
+	reverse(resourceTarget: ResourceTarget) {
+		if (resourceTarget.getIdentifier() === '/homepage:{}') {
+			return { State: HomepageState, params: '{}' }; // TODO
+		} else {
+			throw new Error();
+		}
+	}
 }

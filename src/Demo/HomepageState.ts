@@ -10,8 +10,8 @@ export default class HomepageState {
 		return this.status;
 	}
 
-	setStatus(status: boolean) {
-		this.status = status;
+	toggleStatus() {
+		this.status = !this.status;
 		return this;
 	}
 }

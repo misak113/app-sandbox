@@ -46,7 +46,7 @@ export default class Client extends React.Component<IClientProps, {}> {
 		};
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.clientDispatcher.listen(this.props.clientId);
 	}
 

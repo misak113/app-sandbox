@@ -15,6 +15,8 @@ export enum State {
 	patch,
 	subscribe,
 	unsubscribe,
+	initialize,
+	initialState,
 	update
 }
 
@@ -38,6 +40,14 @@ export class StateActions extends ActionCreator<State> {
 
 	unsubscribe(resourceTarget: ResourceTarget): Action<ISubscribePayload> {
 		return this.createAction(State.unsubscribe, { identifier: resourceTarget.getIdentifier() });
+	}
+
+	initialize(resourceTarget: ResourceTarget): Action<ISubscribePayload> {
+		return this.createAction(State.initialize, { identifier: resourceTarget.getIdentifier() });
+	}
+
+	initialState<S>(S: IEntityStatic<S>, initialState: S, resourceTarget: ResourceTarget): Action<IPatchPayload> {
+		return this.createAction(State.initialState, this.convertor.convertToJS(S, initialState), resourceTarget);
 	}
 
 	update<S>(S: IClassStatic<S>, originalState: S, nextState: S, resource: ResourceTarget): Action<IUpdatePayload> {
@@ -67,6 +77,14 @@ export class StateSignals extends SignalCreator<State> {
 		return this.createSignal(State.unsubscribe);
 	}
 
+	initialize() {
+		return this.createSignal(State.initialize);
+	}
+
+	initialState(resourceTarget: ResourceTarget) {
+		return this.createSignal(State.initialState, resourceTarget.getIdentifier());
+	}
+
 	update(): Signal<{}> {
 		return this.createSignal(State.update);
 	}
@@ -81,6 +99,12 @@ export interface ISubscribePayload {
 export interface IUnsubscribePayload {
 	identifier: string;
 }
+
+export interface IInitializePayload {
+	identifier: string;
+}
+
+export type IInitialStatePayload = any;
 
 export interface IUpdatePayload {
 	StateClass: any;
