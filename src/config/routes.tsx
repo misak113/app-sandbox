@@ -9,7 +9,7 @@ var IndexRoute = require('react-router').IndexRoute;
 var Route = require('react-router').Route;
 /* tslint:enable */
 
-var routes = (
+const routes = (
 	<Route path="/" component={Main}>
 		<IndexRoute component={Homepage}/>
 		<Route path="/users" component={UsersPage}/>

@@ -57,7 +57,7 @@ export default function DefaultProps(StatesStatic: { [stateName: string]: any })
 			}
 
 			componentDidMount() {
-				var initializeState = !this.componentWasInitialized();
+				const initializeState = !this.componentWasInitialized();
 				this.bindings = Object.keys(StatesStatic).map((stateName: string) => {
 					const StateStatic = StatesStatic[stateName];
 					const resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);

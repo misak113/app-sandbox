@@ -17,7 +17,7 @@ export default class ClientDispatcher {
 	) {}
 
 	listen(clientId: string) {
-		var socket = this.socket.getSocketOf(this.namespace.value);
+		const socket = this.socket.getSocketOf(this.namespace.value);
 		socket.on('connect', () => {
 			socket.emit('clientId', clientId);
 		});
@@ -26,10 +26,10 @@ export default class ClientDispatcher {
 
 	private bind(socket: SocketIOClient.Socket) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload, new ServerSource());
+			const action = new Action(name, payload, new ServerSource());
 			this.dispatcher.dispatch(action);
 		});
-		var actionBinding = this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
+		const actionBinding = this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
 			if (!(action.getSource() instanceof ServerSource)) {
 				socket.emit('action', action.getName(), action.getPayload());
 			}

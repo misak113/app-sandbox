@@ -76,10 +76,10 @@ export default class Router extends Component<{}, {}, RouterContext> {
 			const totalTime = process.hrtime(startTime);
 			const clientId = this.getClientId(request);
 			const Component = renderProps.components[renderProps.components.length - 1]; // TODO
-			var initialState: { [stateName: string]: any } = {};
-			var StatesStatic = Reflect.getMetadata(DefaultProps, Component);
+			let initialState: { [stateName: string]: any } = {};
+			const StatesStatic = Reflect.getMetadata(DefaultProps, Component);
 			Object.keys(StatesStatic).map((stateName: string) => {
-				var StateStatic = StatesStatic[stateName];
+				const StateStatic = StatesStatic[stateName];
 				const store = this.context.injector.get<Store<any>>(stores.get(StateStatic));
 				const params = renderProps.params;
 				const state = store.getState(params);

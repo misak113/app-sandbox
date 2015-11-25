@@ -21,15 +21,15 @@ export function getEntityStorage() {
 	return localEntityStorage;
 }
 
-var getMethodNames = (OriginalEntityClass: IEntityStatic<any>) => {
-	var methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
+const getMethodNames = (OriginalEntityClass: IEntityStatic<any>) => {
+	const methodNames = Object.getOwnPropertyNames(OriginalEntityClass.prototype);
 	return methodNames.filter((methodName: string) => methodName !== 'constructor');
 };
 
-var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
+const createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
 	type Properties = { [propertyKey: string]: any };
-	var proxyEntity: Properties = new EntityProxy();
-	var overridenProperties: Properties = {};
+	let proxyEntity: Properties = new EntityProxy();
+	let overridenProperties: Properties = {};
 	entity.data.forEach((value: any, propertyKey: string) => {
 		Object.defineProperty(proxyEntity, propertyKey, {
 			get: () => {
@@ -51,8 +51,8 @@ var createProxyEntity = (EntityProxy: IEntityStatic<any>, entity: any) => {
 	return proxyEntity;
 };
 
-var getOrCreateEntity = (OriginalEntityClass: IEntityStatic<any>, EntityClass: any, data: Map<string, any>) => {
-	var nextEntity = getEntityStorage().restoreEntity<any>(OriginalEntityClass, data);
+const getOrCreateEntity = (OriginalEntityClass: IEntityStatic<any>, EntityClass: any, data: Map<string, any>) => {
+	let nextEntity = getEntityStorage().restoreEntity<any>(OriginalEntityClass, data);
 	if (!nextEntity) {
 		nextEntity = new EntityClass();
 		nextEntity.data = data;
@@ -72,7 +72,7 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 		public data: Map<string, any> = Map({});
 
 		constructor(...args: any[]) {
-			var proxyEntity = createProxyEntity(EntityProxy, this);
+			const proxyEntity = createProxyEntity(EntityProxy, this);
 			OriginalEntityClass.apply(proxyEntity, args);
 			Object.keys(proxyEntity).forEach((propertyKey: string) => {
 				this.data = this.data.set(propertyKey, proxyEntity[propertyKey]);
@@ -84,26 +84,26 @@ function Entity<IEntity>(OriginalEntityClass: IEntityStatic<IEntity>) {
 	Reflect.defineMetadata(Entity, OriginalEntityClass, EntityClass);
 
 	getMethodNames(OriginalEntityClass).forEach((methodName: string) => {
-		var originalMethod = OriginalEntityClass.prototype[methodName];
+		const originalMethod = OriginalEntityClass.prototype[methodName];
 		Object.defineProperty(EntityProxy.prototype, methodName, {
 			get: () => originalMethod
 		});
 		Object.defineProperty(EntityClass.prototype, methodName, {
 			get: () => {
 				return function(...args: any[]) {
-					var originalEntity: EntityClass = this;
-					var proxyEntity = createProxyEntity(EntityProxy, originalEntity);
-					var result = originalMethod.apply(proxyEntity, args);
-					var propertyKeys = Object.keys(proxyEntity);
+					const originalEntity: EntityClass = this;
+					let proxyEntity = createProxyEntity(EntityProxy, originalEntity);
+					const result = originalMethod.apply(proxyEntity, args);
+					const propertyKeys = Object.keys(proxyEntity);
 					if (propertyKeys.length) { // any set of private properties
 						if (result !== proxyEntity) {
 							throw new WrongReturnWhileSetProperties(
 								'If set properties during call method then needs to return self entity'
 							);
 						}
-						var data = originalEntity.data;
+						let data = originalEntity.data;
 						propertyKeys.forEach((propertyKey: string) => {
-							var propertyValue = proxyEntity[propertyKey];
+							const propertyValue = proxyEntity[propertyKey];
 							data = data.set(propertyKey, propertyValue);
 						});
 						if (data !== originalEntity.data) {

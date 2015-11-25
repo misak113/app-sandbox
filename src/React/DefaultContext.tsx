@@ -26,7 +26,7 @@ export default function DefaultContext(contextStatic: any): ClassDecorator {
 					throw new InjectorMissingException('You must pass injector to context of any parent component');
 				}
 				ComponentStatic.contextTypes = ComponentStatic.contextTypes || {};
-				var context = this.context.injector.get(contextStatic);
+				let context = this.context.injector.get(contextStatic);
 				Object.keys(context).forEach((key: string) => {
 					if (!ComponentStatic.contextTypes[key]) {
 						ComponentStatic.contextTypes[key] = PropTypes.any.isRequired;
@@ -47,7 +47,7 @@ export default function DefaultContext(contextStatic: any): ClassDecorator {
 				return <ComponentStatic {...this.props}/>;
 			}
 		}
-		var contextTypes = ComponentStatic.contextTypes || {};
+		const contextTypes = ComponentStatic.contextTypes || {};
 		Object.keys(contextTypes).forEach((key: string) => {
 			ComponentWithContext.contextTypes[key] = contextTypes[key];
 		});

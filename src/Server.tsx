@@ -50,10 +50,10 @@ export default class Server extends React.Component<IServerProps, IServerState> 
 
 	componentWillMount() {
 		this.serverDispatcher.listen();
-		var app = this.expressServer.App;
+		const app = this.expressServer.App;
 		app.use(cookieParser());
 		app.use(serveStatic(__dirname + '/../../../dist'));
-		var port = this.serverOptions.port;
+		const port = this.serverOptions.port;
 		this.httpServer.Server.listen(port, () => console.info('Listen on port ' + port));
 	}
 

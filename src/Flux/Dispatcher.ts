@@ -23,7 +23,7 @@ export default class Dispatcher {
 	}
 
 	bind<Payload>(signal: Signal<any> | Signal<any>[], callback: (action: Action<Payload>) => void) {
-		var signals: Signal<any>[] = signal instanceof Signal ? [<Signal<any>>signal] : <Signal<any>[]>signal;
+		const signals: Signal<any>[] = signal instanceof Signal ? [<Signal<any>>signal] : <Signal<any>[]>signal;
 		signals.forEach((signal: Signal<any>) => {
 			this.eventEmitter.addListener(signal.getName(), callback);
 		});
@@ -33,7 +33,7 @@ export default class Dispatcher {
 
 	unbind<Payload>(binding: Binding<Payload>) {
 		binding.getSignals().forEach((signal: Signal<any>) => {
-			var callback = binding.getCallback();
+			const callback = binding.getCallback();
 			if (this.eventEmitter.listeners(signal.getName()).indexOf(callback) === -1) {
 				throw new FluxDispatcherUnbindException('Try to unbind not binded Binding', binding);
 			}

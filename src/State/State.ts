@@ -30,7 +30,7 @@ export class StateActions extends ActionCreator<State> {
 	}
 
 	patch<S>(S: IEntityStatic<S>, originalState: S, nextState: S, resourceTarget: ResourceTarget): Action<IPatchPayload> {
-		var ops = this.convertor.diff(S, originalState, nextState);
+		const ops = this.convertor.diff(S, originalState, nextState);
 		return this.createAction(State.patch, ops.toJS(), resourceTarget);
 	}
 

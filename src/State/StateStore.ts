@@ -37,20 +37,20 @@ export default class StateStore {
 	}
 
 	private updateState(action: Action<IUpdatePayload>) {
-		var State = action.getPayload().StateClass;
-		var originalState = action.getPayload().originalState;
-		var nextState = action.getPayload().nextState;
-		var resourceTarget = action.getPayload().resource;
+		const State = action.getPayload().StateClass;
+		const originalState = action.getPayload().originalState;
+		const nextState = action.getPayload().nextState;
+		const resourceTarget = action.getPayload().resource;
 		this.states = this.states.set(resourceTarget.getIdentifier(), nextState);
-		var patchAction = this.stateActions.patch(State, originalState, nextState, resourceTarget);
+		const patchAction = this.stateActions.patch(State, originalState, nextState, resourceTarget);
 		this.dispatcher.dispatch(patchAction);
 	}
 
 	private initialize(action: Action<IInitializePayload>) {
-		var resourceTarget = new ResourceTarget(action.getPayload().identifier);
-		var { State } = this.resourceFactory.reverse(resourceTarget);
-		var initialState = this.states.get(resourceTarget.getIdentifier());
-		var initialStateAction = this.stateActions.initialState(State, initialState, resourceTarget);
+		const resourceTarget = new ResourceTarget(action.getPayload().identifier);
+		const { State } = this.resourceFactory.reverse(resourceTarget);
+		const initialState = this.states.get(resourceTarget.getIdentifier());
+		const initialStateAction = this.stateActions.initialState(State, initialState, resourceTarget);
 		this.dispatcher.dispatch(initialStateAction);
 	}
 }

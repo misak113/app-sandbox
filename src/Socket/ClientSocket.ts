@@ -13,7 +13,7 @@ export default class ClientSocket {
 	) {}
 
 	getSocketOf(namespace: string) {
-		var uri = this.buildUri(namespace);
+		const uri = this.buildUri(namespace);
 		return this.sockets[namespace] = this.sockets[namespace] || io(uri);
 	}
 

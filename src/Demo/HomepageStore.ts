@@ -23,14 +23,14 @@ export default class HomepageStore extends Store<HomepageState> {
 	}
 
 	getState(params: { [name: string]: string }) {
-		var resourceTarget = this.resourceFactory.get(HomepageState, params);
+		const resourceTarget = this.resourceFactory.get(HomepageState, params);
 		return this.stateStore.get(resourceTarget);
 	}
 
 	private changeStatus() {
-		var resourceTarget = this.resourceFactory.get(HomepageState, {});
-		var originalState = this.getState({});
-		var nextState = originalState.toggleStatus();
+		const resourceTarget = this.resourceFactory.get(HomepageState, {});
+		const originalState = this.getState({});
+		const nextState = originalState.toggleStatus();
 		this.dispatcher.dispatch(this.stateActions.update(
 			HomepageState,
 			originalState,

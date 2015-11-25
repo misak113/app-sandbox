@@ -35,7 +35,7 @@ export default class ServerDispatcher {
 		if (!(action.getSource() instanceof ClientSource)) {
 			throw new Error(); // TODO
 		}
-		var socket = this.socketMap.get(action.getSource().getId());
+		const socket = this.socketMap.get(action.getSource().getId());
 		if (!socket) {
 			throw new Error(); // TODO
 		}
@@ -46,7 +46,7 @@ export default class ServerDispatcher {
 		if (!(action.getSource() instanceof ClientSource)) {
 			throw new Error(); // TODO
 		}
-		var socket = this.socketMap.get(action.getSource().getId());
+		const socket = this.socketMap.get(action.getSource().getId());
 		if (!socket) {
 			throw new Error(); // TODO
 		}
@@ -54,13 +54,13 @@ export default class ServerDispatcher {
 	}
 
 	listen() {
-		var namespace = this.socket.Socket.of(this.namespace.value);
+		const namespace = this.socket.Socket.of(this.namespace.value);
 		namespace.on('connect', (socket: SocketIO.Socket) => {
 			socket.on('clientId', (clientId: string) => this.bind(socket, clientId));
 		});
 		this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
 			if (!(action.getSource() instanceof ClientSource)) {
-				var target = action.getTarget();
+				const target = action.getTarget();
 				if (target instanceof ResourceTarget) {
 					namespace.to(target.getIdentifier()).emit('action', action.getName(), action.getPayload());
 				}
@@ -70,7 +70,7 @@ export default class ServerDispatcher {
 
 	private bind(socket: SocketIO.Socket, clientId: string) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload, new ClientSource(clientId));
+			const action = new Action(name, payload, new ClientSource(clientId));
 			this.dispatcher.dispatch(action);
 		});
 		socket.on('disconnect', () => {
