@@ -74,7 +74,7 @@ export default class Router extends Component<{}, {}, RouterContext> {
 				.redirect(redirectLocation.pathname + redirectLocation.search);
 		} else if (renderProps) {
 			const totalTime = process.hrtime(startTime);
-			const clientId = this.getClientId(request);
+			const clientId = this.generateClientId();
 			const Component = renderProps.components[renderProps.components.length - 1]; // TODO
 			let initialState: { [stateName: string]: any } = {};
 			const StatesStatic = Reflect.getMetadata(DefaultProps, Component);
@@ -117,7 +117,6 @@ export default class Router extends Component<{}, {}, RouterContext> {
 			const body = renderToString(<Client/>);
 			const initialScript = this.getInitialScript(initialState, clientId);
 			response.status(200)
-				.cookie('clientId', clientId)
 				.header(this.getHeader(body, totalTime, clientId))
 				.send(this.doctype + initialScript + body);
 		} else {
@@ -125,8 +124,8 @@ export default class Router extends Component<{}, {}, RouterContext> {
 		}
 	}
 
-	private getClientId(request: Request) {
-		return request.cookies.clientId || '' + Math.random();
+	private generateClientId() {
+		return '' + Math.random();
 	}
 
 	private getInitialScript(initialState: any, clientId: string) {
