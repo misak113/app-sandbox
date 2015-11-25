@@ -1,4 +1,6 @@
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+import 'reflect-metadata';
 import * as React from 'react';
 import Component from '../React/Component';
 import DefaultContext from '../React/DefaultContext';

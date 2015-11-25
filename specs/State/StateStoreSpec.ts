@@ -2,6 +2,7 @@
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
 import { StateActions, StateSignals, IPatchPayload } from '../../src/State/State';
 import ResourceTarget from '../../src/Addressing/ResourceTarget';
+import ResourceFactory from '../../src/Addressing/ResourceFactory';
 import StateStore from '../../src/State/StateStore';
 import MyState from './MyState';
 import Convertor from '../../src/Immutable/Convertor';
@@ -17,6 +18,7 @@ describe('State.StateStore', () => {
 	var convertor = new Convertor(entityStorage);
 	var stateActions = new StateActions(convertor);
 	var stateSignals = new StateSignals();
+	var resourceFactory = new ResourceFactory();
 	var clientStateStore;
 
 	const clientStateBefore = new MyState({
@@ -32,14 +34,16 @@ describe('State.StateStore', () => {
 		clientStateStore = new StateStore(
 			dispatcher,
 			stateActions,
-			stateSignals
+			stateSignals,
+			resourceFactory
 		);
 	});
 
 	it('should dispatch patch action after got update action', (done: Function) => {
 		var countOfCallbackExecuted = 0;
-		dispatcher.dispatch(stateActions.update(MyState, clientStateBefore, clientStateAfter, new ResourceTarget('myClientId')));
-		dispatcher.bind(stateSignals.patch(), (action: Action<IPatchPayload>) => {
+		const resourceTarget = new ResourceTarget('myClientId');
+		dispatcher.dispatch(stateActions.update(MyState, clientStateBefore, clientStateAfter, resourceTarget));
+		dispatcher.bind(stateSignals.patch(resourceTarget), (action: Action<IPatchPayload>) => {
 			expect(action.getName()).toBe('State.State:patch');
 			expect(action.getPayload()).toEqual([{
 				op: 'replace',

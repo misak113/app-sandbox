@@ -1,4 +1,6 @@
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+import 'reflect-metadata';
 import {ArgumentIsNotImmutableEntityException} from './exceptions';
 import IEntityStatic from './IEntityStatic';
 import embedded from './embedded';

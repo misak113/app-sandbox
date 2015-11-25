@@ -66,11 +66,12 @@ describe('State', () => {
 		var stateSignals = new StateSignals();
 
 		it('should create patch signal', () => {
-			var signal = stateSignals.patch();
+			const resourceTarget = new ResourceTarget('/my-resource');
+			var signal = stateSignals.patch(resourceTarget);
 			expect(signal instanceof Signal).toBeTruthy();
 			expect(StateSignals)
 				.toBe(getSignalCreatorStatic(signal.getName(), State, State.patch));
-			expect(signal.getPayload()).toBeUndefined();
+			expect(signal.getPayload()).toBe('/my-resource');
 		});
 
 		it('should create update signal', () => {

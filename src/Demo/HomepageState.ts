@@ -1,6 +1,8 @@
 
 import Entity from '../Immutable/Entity';
+import name from '../Addressing/name';
 
+@name('/homepage')
 @Entity
 export default class HomepageState {
 

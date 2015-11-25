@@ -1,4 +1,6 @@
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+import 'reflect-metadata';
 import * as React from 'react';
 import Action from '../Flux/Action';
 import Binding from '../Flux/Binding';

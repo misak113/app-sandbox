@@ -1,4 +1,6 @@
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+import 'reflect-metadata';
 import IEntityStatic from './IEntityStatic';
 import { WrongReturnWhileSetProperties, NotEntityStorageWasSetException } from './exceptions';
 import { Map } from 'immutable';
