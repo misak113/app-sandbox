@@ -13,7 +13,7 @@ export default class ServerSocket {
 	constructor(
 		httpServer: HttpServer
 	) {
-		var options = {
+		const options = {
 			serveClient: false
 		};
 		this.socket = io(httpServer.Server, options);

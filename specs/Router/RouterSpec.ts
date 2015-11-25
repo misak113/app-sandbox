@@ -10,7 +10,7 @@ var ReactDOMServer: IReactDOMServer = require('react-dom/server');
 
 describe('Router.Router', () => {
 	xit('should render page server-side', () => {
-		var html = ReactDOMServer.renderToStaticMarkup(
+		const html = ReactDOMServer.renderToStaticMarkup(
 			React.createElement(Router, { injector: new Injector() })
 		);
 		expect(html).toBeNull();

@@ -5,9 +5,9 @@ merge = require 'merge2'
 plumber = require 'gulp-plumber'
 errorHandler = require '../lib/errorHandler'
 paths = require '../config/paths'
-require './build-js-ts-tsd'
+require './install-js-ts-tsd'
 
-gulp.task 'build-js-ts', ['build-js-ts-tsd'], ->
+gulp.task 'build-js-ts', ['install-js-ts-tsd'], ->
   tsProject = ts.createProject paths.ts.config
   files = paths.ts.src.concat([
     paths.tsd.src

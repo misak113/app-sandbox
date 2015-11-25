@@ -1,7 +1,5 @@
 
 import * as React from 'react';
-import {PropTypes, ValidationMap} from 'react';
-import Component from './React/Component';
 import Router from './Router/Router';
 import ServerDispatcher from './Socket/ServerDispatcher';
 import {Injector} from 'di';
@@ -10,33 +8,38 @@ import * as cookieParser from 'cookie-parser';
 import ExpressServer from './Http/ExpressServer';
 import HttpServer from './Http/HttpServer';
 import ServerOptions from './Http/ServerOptions';
-import stores from './config/stores';
+import EntityStorage from './Immutable/EntityStorage';
+import { setEntityStorage } from './Immutable/Entity';
+import StateStore from './State/StateStore';
 
 export interface IServerProps {
 	injector: Injector;
 }
 
 export interface IServerState {
-	expressServer: ExpressServer;
-	serverDispatcher: ServerDispatcher;
-	httpServer: HttpServer;
-	serverOptions: ServerOptions;
 }
 
-export default class Server extends Component<IServerProps, IServerState, {}> {
+export default class Server extends React.Component<IServerProps, IServerState> {
 
-	static childContextTypes: ValidationMap<any> = {
-		injector: PropTypes.object
+	private expressServer: ExpressServer;
+	private serverDispatcher: ServerDispatcher;
+	private httpServer: HttpServer;
+	private serverOptions: ServerOptions;
+	private stateStore: StateStore;
+
+	static childContextTypes: React.ValidationMap<any> = {
+		injector: React.PropTypes.object
 	};
 
 	constructor(props: IServerProps, context: {}) {
 		super(props, context);
-		this.state = {
-			expressServer: this.props.injector.get(ExpressServer),
-			serverDispatcher: this.props.injector.get(ServerDispatcher),
-			httpServer: this.props.injector.get(HttpServer),
-			serverOptions: this.props.injector.get(ServerOptions)
-		};
+		setEntityStorage(this.props.injector.get(EntityStorage));
+		this.expressServer = this.props.injector.get(ExpressServer);
+		this.serverDispatcher = this.props.injector.get(ServerDispatcher);
+		this.httpServer = this.props.injector.get(HttpServer);
+		this.serverOptions = this.props.injector.get(ServerOptions);
+		// Allow send patches of states
+		this.stateStore = this.props.injector.get(StateStore);
 	}
 
 	getChildContext() {
@@ -46,13 +49,12 @@ export default class Server extends Component<IServerProps, IServerState, {}> {
 	}
 
 	componentWillMount() {
-		this.state.serverDispatcher.listen();
-		stores.forEach((store: any) => this.props.injector.get(store));
-		var app = this.state.expressServer.App;
+		this.serverDispatcher.listen();
+		const app = this.expressServer.App;
 		app.use(cookieParser());
 		app.use(serveStatic(__dirname + '/../../../dist'));
-		var port = this.state.serverOptions.port;
-		this.state.httpServer.Server.listen(port, () => console.info('Listen on port ' + port));
+		const port = this.serverOptions.port;
+		this.httpServer.Server.listen(port, () => console.info('Listen on port ' + port));
 	}
 
 	render() {

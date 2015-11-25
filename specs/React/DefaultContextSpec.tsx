@@ -19,7 +19,7 @@ describe('React.DefaultContext', () => {
 	}
 
 	it('should set default context to react component', () => {
-		var injector = new InjectorConstructor();
+		const injector = new InjectorConstructor();
 
 		@Inject
 		class CarContext {
@@ -55,13 +55,13 @@ describe('React.DefaultContext', () => {
 			}
 		}
 
-		var app = React.createElement(App, { injector: injector });
-		var body = ReactDOMServer.renderToStaticMarkup(app);
+		const app = React.createElement(App, { injector: injector });
+		const body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Michael</div>');
 	});
 
 	it('should override default context from parent context definition', () => {
-		var injector = new InjectorConstructor();
+		const injector = new InjectorConstructor();
 
 		@Inject
 		class BikeContext {
@@ -118,13 +118,13 @@ describe('React.DefaultContext', () => {
 			}
 		}
 
-		var app = React.createElement(App, { injector: injector });
-		var body = ReactDOMServer.renderToStaticMarkup(app);
+		const app = React.createElement(App, { injector: injector });
+		const body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Daniel</div>');
 	});
 
 	it('should override default context from parent context definition changing type of context value', () => {
-		var injector = new InjectorConstructor();
+		const injector = new InjectorConstructor();
 
 		@Inject
 		class CarContext {
@@ -180,13 +180,13 @@ describe('React.DefaultContext', () => {
 			}
 		}
 
-		var app = React.createElement(App, { injector: injector });
-		var body = ReactDOMServer.renderToStaticMarkup(app);
+		const app = React.createElement(App, { injector: injector });
+		const body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Alfred</div>');
 	});
 
 	it('should setup default context for nested components also', () => {
-		var injector = new InjectorConstructor();
+		const injector = new InjectorConstructor();
 
 		class Sign {
 			constructor(
@@ -245,13 +245,13 @@ describe('React.DefaultContext', () => {
 			}
 		}
 
-		var app = React.createElement(App, { injector: injector });
-		var body = ReactDOMServer.renderToStaticMarkup(app);
+		const app = React.createElement(App, { injector: injector });
+		const body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Stop - <div>Michael</div></div>');
 	});
 
 	it('should allow to override injector by any component', () => {
-		var injector = new InjectorConstructor();
+		const injector = new InjectorConstructor();
 
 		@Provide(Rider)
 		class RaceRider {
@@ -260,7 +260,7 @@ describe('React.DefaultContext', () => {
 			) { }
 		}
 
-		var injectorWithRacers = new InjectorConstructor([
+		const injectorWithRacers = new InjectorConstructor([
 			RaceRider
 		]);
 
@@ -325,8 +325,8 @@ describe('React.DefaultContext', () => {
 			}
 		}
 
-		var app = React.createElement(App, { injector: injector });
-		var body = ReactDOMServer.renderToStaticMarkup(app);
+		const app = React.createElement(App, { injector: injector });
+		const body = ReactDOMServer.renderToStaticMarkup(app);
 		expect(body).toBe('<div>Michael is not <div>Alonzo</div></div>');
 	});
 });

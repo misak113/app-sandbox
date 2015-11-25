@@ -2,50 +2,81 @@
 import {Inject} from 'di-ts';
 import ServerSocket from './ServerSocket';
 import Action from '../Flux/Action';
+import AnySignal from '../Flux/AnySignal';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
 import ClientSource from '../Addressing/ClientSource';
-import ClientTarget from '../Addressing/ClientTarget';
+import ResourceTarget from '../Addressing/ResourceTarget';
+import { StateSignals, ISubscribePayload, IUnsubscribePayload } from '../State/State';
+import { Map } from 'immutable';
 
 @Inject
 export default class ServerDispatcher {
 
+	private socketMap = Map<string, SocketIO.Socket>();
+
 	constructor(
 		private namespace: DispatcherNamespace,
 		private socket: ServerSocket,
-		private dispatcher: Dispatcher
-	) {}
+		private dispatcher: Dispatcher,
+		private stateSignals: StateSignals
+	) {
+		this.dispatcher.bind(
+			this.stateSignals.subscribe(),
+			(action: Action<ISubscribePayload>) => this.subscribe(action)
+		);
+		this.dispatcher.bind(
+			this.stateSignals.unsubscribe(),
+			(action: Action<IUnsubscribePayload>) => this.unsubscribe(action)
+		);
+	}
+
+	private subscribe(action: Action<ISubscribePayload>) {
+		if (!(action.getSource() instanceof ClientSource)) {
+			throw new Error(); // TODO
+		}
+		const socket = this.socketMap.get(action.getSource().getId());
+		if (!socket) {
+			throw new Error(); // TODO
+		}
+		socket.join(action.getPayload().identifier);
+	}
+
+	private unsubscribe(action: Action<IUnsubscribePayload>) {
+		if (!(action.getSource() instanceof ClientSource)) {
+			throw new Error(); // TODO
+		}
+		const socket = this.socketMap.get(action.getSource().getId());
+		if (!socket) {
+			throw new Error(); // TODO
+		}
+		socket.leave(action.getPayload().identifier);
+	}
 
 	listen() {
-		var namespace = this.socket.Socket.of(this.namespace.value);
+		const namespace = this.socket.Socket.of(this.namespace.value);
 		namespace.on('connect', (socket: SocketIO.Socket) => {
 			socket.on('clientId', (clientId: string) => this.bind(socket, clientId));
+		});
+		this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
+			if (!(action.getSource() instanceof ClientSource)) {
+				const target = action.getTarget();
+				if (target instanceof ResourceTarget) {
+					namespace.to(target.getIdentifier()).emit('action', action.getName(), action.getPayload());
+				}
+			}
 		});
 	}
 
 	private bind(socket: SocketIO.Socket, clientId: string) {
 		socket.on('action', (name: string, payload?: any) => {
-			var action = new Action(name, payload, new ClientSource(clientId));
+			const action = new Action(name, payload, new ClientSource(clientId));
 			this.dispatcher.dispatch(action);
 		});
-		var actionBinding = this.dispatcher.bind('*', (action: Action) => {
-			if (!(action.Source instanceof ClientSource) && this.isTarget(action.Target, clientId)) {
-				socket.emit('action', action.Name, action.Payload);
-			}
-		});
 		socket.on('disconnect', () => {
-			this.dispatcher.unbind(actionBinding);
+			this.socketMap = this.socketMap.remove(clientId);
 		});
 		socket.on('error', (error: Error) => console.error(error));
-	}
-
-	private isTarget(target: any, clientId: string) {
-		if (!target) {
-			return true;
-		}
-		if (target instanceof ClientTarget && target.Id === clientId) {
-			return true;
-		}
-		return false;
+		this.socketMap = this.socketMap.set(clientId, socket);
 	}
 }

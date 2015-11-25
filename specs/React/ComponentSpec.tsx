@@ -22,7 +22,7 @@ describe('React.Component', () => {
 			};
 
 			render() {
-				var context: IMyContext = this.context;
+				const context: IMyContext = this.context;
 				return <div>{context.dog}</div>;
 			}
 		}
@@ -44,7 +44,7 @@ describe('React.Component', () => {
 			}
 		}
 
-		var html = ReactDOMServer.renderToStaticMarkup(
+		const html = ReactDOMServer.renderToStaticMarkup(
 			React.createElement(MyParentComponent)
 		);
 		expect(html).toBe('<div>Peggy</div>');

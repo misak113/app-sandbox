@@ -1,20 +1,23 @@
 
 import * as React from 'react';
-import Component from '../React/Component';
-import Status from './Status';
+import StatusView from './StatusView';
 import ToggleButton from './ToggleButton';
-import IClientState from '../ClientState/IClientState';
+import HomepageState from './HomepageState';
+import DefaultProps from '../React/DefaultProps';
 
 export interface IHomepageProps {
-	clientState: IClientState;
+	homepage: HomepageState;
 }
 
-export default class Homepage extends Component<IHomepageProps, {}, {}> {
+@DefaultProps({
+	homepage: HomepageState
+})
+export default class Homepage extends React.Component<IHomepageProps, {}> {
 
 	render() {
 		return (
 			<div>
-				<Status status={this.props.clientState.get('status')}/>
+				<StatusView status={this.props.homepage.getStatus() }/>
 				<ToggleButton/>
 			</div>
 		);

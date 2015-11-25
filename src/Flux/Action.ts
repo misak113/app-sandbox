@@ -1,15 +1,26 @@
 
-export default class Action {
-
-	get Name() { return this.name; }
-	get Payload() { return this.payload; }
-	get Source() { return this.source; }
-	get Target() { return this.target; }
+export default class Action<Payload> {
 
 	constructor(
 		private name: string,
-		private payload?: any,
+		private payload?: Payload,
 		private source?: any,
 		private target?: any
 	) {}
+
+	getName() {
+		return this.name;
+	}
+
+	getPayload() {
+		return this.payload;
+	}
+
+	getSource() {
+		return this.source;
+	}
+
+	getTarget() {
+		return this.target;
+	}
 }

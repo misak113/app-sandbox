@@ -1,5 +1,7 @@
 
 @import './node_modules/bootstrap/dist/css/bootstrap';
 @import './Layout/Main';
+@import './Demo/User/UsersPage';
 
 @include Main;
+@include Demo-User-UsersPage;
