@@ -4,7 +4,7 @@ import Signal from '../../src/Flux/Signal';
 describe('Flux.Signal', () => {
 
 	it('should create instance of Signal with required properties', () => {
-		var signal = new Signal(
+		const signal = new Signal(
 			'My.Namespace:NAME'
 		);
 		expect(signal instanceof Signal).toBeTruthy();
@@ -13,7 +13,7 @@ describe('Flux.Signal', () => {
 	});
 
 	it('should create instance of Signal with optional properties', () => {
-		var signal = new Signal(
+		const signal = new Signal(
 			'My.Namespace:NAME',
 			{ whatever: 'you want' }
 		);

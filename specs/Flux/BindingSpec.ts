@@ -6,8 +6,8 @@ import Signal from '../../src/Flux/Signal';
 describe('Flux.Binding', () => {
 
 	it('should create instance of Binding with signals & callback', () => {
-		var was = null;
-		var binding = new Binding(
+		let was = null;
+		const binding = new Binding(
 			[new Signal('My.Namespace:NAME')],
 			(action: Action<any>) => { was = 'called: ' + action.getName(); }
 		);

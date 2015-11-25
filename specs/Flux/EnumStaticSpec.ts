@@ -9,39 +9,39 @@ describe('Flux.EnumStatic', () => {
 	}
 
 	it('should allow to store enum ActionName static to type ActionNameStatic', () => {
-		var actionNameStatic: EnumStatic<MyActionName> = MyActionName;
+		const actionNameStatic: EnumStatic<MyActionName> = MyActionName;
 		// enum has length doubled because of convertion both side string <-> number
 		expect(Object.keys(actionNameStatic).length).toBe(4);
 	});
 
 	it('should allow to get enum ActionName value from ActionNameStatic type', () => {
-		var actionNameStatic: EnumStatic<MyActionName> = MyActionName;
+		const actionNameStatic: EnumStatic<MyActionName> = MyActionName;
 
-		var whatValue1 = actionNameStatic[MyActionName.WHAT];
+		const whatValue1 = actionNameStatic[MyActionName.WHAT];
 		expect(whatValue1).toBe('WHAT');
 
-		var whatValue2 = actionNameStatic[0];
+		const whatValue2 = actionNameStatic[0];
 		expect(whatValue2).toBe('WHAT');
 
-		var whatInputEnum: number = 0;
-		var whatValue3 = actionNameStatic[whatInputEnum];
+		const whatInputEnum: number = 0;
+		const whatValue3 = actionNameStatic[whatInputEnum];
 		expect(whatValue3).toBe('WHAT');
 
 		/* tslint:disable */
-		var whatValue4 = actionNameStatic[actionNameStatic['WHAT']];
+		const whatValue4 = actionNameStatic[actionNameStatic['WHAT']];
 		/* tslint:enable */
 		expect(whatValue4).toBe('WHAT');
 
-		var whatEnum1 = (<any>actionNameStatic).WHAT;
+		const whatEnum1 = (<any>actionNameStatic).WHAT;
 		expect(whatEnum1).toBe(0);
 
 		/* tslint:disable */
-		var whatEnum2 = actionNameStatic['WHAT'];
+		const whatEnum2 = actionNameStatic['WHAT'];
 		/* tslint:enable */
 		expect(whatEnum1).toBe(0);
 
-		var whatInputValue: string = 'WHAT';
-		var whatEnum3 = actionNameStatic[whatInputValue];
+		const whatInputValue: string = 'WHAT';
+		const whatEnum3 = actionNameStatic[whatInputValue];
 		expect(whatEnum3).toBe(0);
 	});
 });

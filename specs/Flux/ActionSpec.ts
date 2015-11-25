@@ -4,7 +4,7 @@ import Action from '../../src/Flux/Action';
 describe('Flux.Action', () => {
 
 	it('should create instance of Action with required properties', () => {
-		var action = new Action(
+		const action = new Action(
 			'My.Namespace:NAME'
 		);
 		expect(action instanceof Action).toBeTruthy();
@@ -15,7 +15,7 @@ describe('Flux.Action', () => {
 	});
 
 	it('should create instance of Action with optional properties', () => {
-		var action = new Action(
+		const action = new Action(
 			'My.Namespace:NAME',
 			{ whatever: 'you want' },
 			{ sourceType: 'Client', clientId: 'Client1' },

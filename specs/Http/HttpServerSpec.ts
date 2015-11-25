@@ -5,8 +5,8 @@ import ExpressServer from '../../src/Http/ExpressServer';
 describe('Http.HttpServer', () => {
 
 	it('should create express app instance', () => {
-		var expressServer = new ExpressServer();
-		var httpServer = new HttpServer(expressServer);
+		const expressServer = new ExpressServer();
+		const httpServer = new HttpServer(expressServer);
 		expect(typeof httpServer.Server === 'object').toBeTruthy();
 	});
 });

@@ -29,7 +29,7 @@ describe('Flux.ActionCreator', () => {
 		IT
 	}
 
-	var myActions = new MyActions();
+	const myActions = new MyActions();
 
 	it('should return action name prefixed by ActionCreator name', () => {
 		expect(myActions.lets().getName()).toBe('Flux.My:LETS');
@@ -38,19 +38,19 @@ describe('Flux.ActionCreator', () => {
 	});
 
 	it('should return action instance', () => {
-		var letsAction = myActions.lets();
+		const letsAction = myActions.lets();
 		expect(letsAction instanceof Action).toBeTruthy();
 		expect(letsAction.getName()).toBe('Flux.My:LETS');
 		expect(letsAction.getPayload()).toEqual({ do: 'it' });
 
-		var tryAction = myActions.try('you');
+		const tryAction = myActions.try('you');
 		expect(tryAction instanceof Action).toBeTruthy();
 		expect(tryAction.getName()).toBe('Flux.My:TRY');
 		expect(tryAction.getPayload()).toEqual({ done: 'you' });
 		expect(tryAction.getSource()).toBe('you');
 		expect(tryAction.getTarget()).toBe('he');
 
-		var itAction = myActions.it('me', 'you');
+		const itAction = myActions.it('me', 'you');
 		expect(itAction instanceof Action).toBeTruthy();
 		expect(itAction.getName()).toBe('Flux.My:IT');
 		expect(itAction.getPayload()).toEqual({ did: 'me' });

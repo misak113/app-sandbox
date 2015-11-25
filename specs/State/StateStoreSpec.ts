@@ -13,13 +13,13 @@ import Dispatcher from '../../src/Flux/Dispatcher';
 
 describe('State.StateStore', () => {
 
-	var dispatcher;
-	var entityStorage = new EntityStorage();
-	var convertor = new Convertor(entityStorage);
-	var stateActions = new StateActions(convertor);
-	var stateSignals = new StateSignals();
-	var resourceFactory = new ResourceFactory();
-	var clientStateStore;
+	let dispatcher;
+	const entityStorage = new EntityStorage();
+	const convertor = new Convertor(entityStorage);
+	const stateActions = new StateActions(convertor);
+	const stateSignals = new StateSignals();
+	const resourceFactory = new ResourceFactory();
+	let clientStateStore;
 
 	const clientStateBefore = new MyState({
 		a: 1
@@ -40,7 +40,7 @@ describe('State.StateStore', () => {
 	});
 
 	it('should dispatch patch action after got update action', (done: Function) => {
-		var countOfCallbackExecuted = 0;
+		let countOfCallbackExecuted = 0;
 		const resourceTarget = new ResourceTarget('myClientId');
 		dispatcher.dispatch(stateActions.update(MyState, clientStateBefore, clientStateAfter, resourceTarget));
 		dispatcher.bind(stateSignals.patch(resourceTarget), (action: Action<IPatchPayload>) => {

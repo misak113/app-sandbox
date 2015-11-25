@@ -21,10 +21,10 @@ describe('Flux.Store', () => {
 		}
 	}
 
-	var myStore = new MyStore();
+	const myStore = new MyStore();
 
 	it('should return state by params', () => {
-		var myState = myStore.getState({ name: 'what' });
+		const myState = myStore.getState({ name: 'what' });
 		expect(myState).toEqual(new MyState({ name: 'what' }));
 	});
 

@@ -12,7 +12,7 @@ import { getActionCreatorStatic, getSignalCreatorStatic } from '../Flux/Helper';
 
 describe('State', () => {
 
-	var entityStorage = new EntityStorage();
+	const entityStorage = new EntityStorage();
 	setEntityStorage(entityStorage);
 
 	beforeEach(() => {
@@ -21,8 +21,8 @@ describe('State', () => {
 
 	describe('StateActions', () => {
 
-		var convertor = new Convertor(entityStorage);
-		var stateActions = new StateActions(convertor);
+		const convertor = new Convertor(entityStorage);
+		const stateActions = new StateActions(convertor);
 
 		const clientStateBefore = new MyState({
 			a: 1
@@ -32,7 +32,7 @@ describe('State', () => {
 		});
 
 		it('should create patch action', () => {
-			var action = stateActions.patch(MyState, clientStateBefore, clientStateAfter, new ResourceTarget('myClientId'));
+			const action = stateActions.patch(MyState, clientStateBefore, clientStateAfter, new ResourceTarget('myClientId'));
 			expect(action instanceof Action).toBeTruthy();
 			expect(StateActions)
 				.toBe(getActionCreatorStatic(action.getName(), State, State.patch));
@@ -45,7 +45,7 @@ describe('State', () => {
 		});
 
 		it('should create update action', () => {
-			var action = stateActions.update(MyState, clientStateBefore, clientStateAfter, new ResourceTarget('myClientId'));
+			const action = stateActions.update(MyState, clientStateBefore, clientStateAfter, new ResourceTarget('myClientId'));
 			expect(action instanceof Action).toBeTruthy();
 			expect(StateActions).toBe(getActionCreatorStatic(action.getName(), State, State.update));
 			expect(action.getPayload().StateClass).toBe(MyState);
@@ -55,7 +55,7 @@ describe('State', () => {
 		});
 
 		it('should create subscribe action', () => {
-			var action = stateActions.subscribe(new ResourceTarget('myClientId'));
+			const action = stateActions.subscribe(new ResourceTarget('myClientId'));
 			expect(action instanceof Action).toBeTruthy();
 			expect(action.getPayload().identifier).toBe('myClientId');
 		});
@@ -63,11 +63,11 @@ describe('State', () => {
 
 	describe('StateSignals', () => {
 
-		var stateSignals = new StateSignals();
+		const stateSignals = new StateSignals();
 
 		it('should create patch signal', () => {
 			const resourceTarget = new ResourceTarget('/my-resource');
-			var signal = stateSignals.patch(resourceTarget);
+			const signal = stateSignals.patch(resourceTarget);
 			expect(signal instanceof Signal).toBeTruthy();
 			expect(StateSignals)
 				.toBe(getSignalCreatorStatic(signal.getName(), State, State.patch));
@@ -75,7 +75,7 @@ describe('State', () => {
 		});
 
 		it('should create update signal', () => {
-			var signal = stateSignals.update();
+			const signal = stateSignals.update();
 			expect(signal instanceof Signal).toBeTruthy();
 			expect(StateSignals)
 				.toBe(getSignalCreatorStatic(signal.getName(), State, State.update));
@@ -83,7 +83,7 @@ describe('State', () => {
 		});
 
 		it('should create subscribe signal', () => {
-			var signal = stateSignals.subscribe();
+			const signal = stateSignals.subscribe();
 			expect(signal instanceof Signal).toBeTruthy();
 			expect(StateSignals)
 				.toBe(getSignalCreatorStatic(signal.getName(), State, State.subscribe));

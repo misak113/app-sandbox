@@ -7,9 +7,9 @@ import {FluxDispatcherUnbindException} from '../../src/Flux/exceptions';
 describe('Flux.Dispatcher', () => {
 
 	it('should dispatch action to binded callbacks', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var dispatcher = new Dispatcher();
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		const dispatcher = new Dispatcher();
 		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			expect(action.getName()).toBe('MyName');
 			expect(action.getPayload()).toBe('MyPayload');
@@ -30,9 +30,9 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should not dispatch action to binded callbacks with other name', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var dispatcher = new Dispatcher();
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		const dispatcher = new Dispatcher();
 		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
@@ -49,9 +49,9 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should dispatch action to binded * asterisk callback', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var dispatcher = new Dispatcher();
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		const dispatcher = new Dispatcher();
 		dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
@@ -69,10 +69,10 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should dispatch action to binded callbacks does not depend on order of bind/dispatch call', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var countOfExecutionThree = 0;
-		var dispatcher = new Dispatcher();
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		let countOfExecutionThree = 0;
+		const dispatcher = new Dispatcher();
 		dispatcher.dispatch(new Action('MyName'));
 		dispatcher.dispatch(new Action('OtherName'));
 		dispatcher.dispatch(new Action('AnotherNotBindedDirectly'));
@@ -95,10 +95,10 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should dispatch action to multiple binded callbacks', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var countOfExecutionThree = 0;
-		var dispatcher = new Dispatcher();
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		let countOfExecutionThree = 0;
+		const dispatcher = new Dispatcher();
 		dispatcher.bind([new Signal('MyName'), new Signal('OtherName')], (action: Action<any>) => {
 			if (action.getName() === 'MyName') {
 				countOfExecutionOne++;
@@ -123,9 +123,9 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should unbind binded callbacks', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var dispatcher = new Dispatcher();
-		var oneActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
+		let countOfExecutionOne = 0;
+		const dispatcher = new Dispatcher();
+		const oneActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -143,10 +143,10 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should unbind multiple binded callbacks', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var countOfExecutionTwo = 0;
-		var dispatcher = new Dispatcher();
-		var bothActionBinding = dispatcher.bind([new Signal('MyName'), new Signal('OtherName')], (action: Action<any>) => {
+		let countOfExecutionOne = 0;
+		let countOfExecutionTwo = 0;
+		const dispatcher = new Dispatcher();
+		const bothActionBinding = dispatcher.bind([new Signal('MyName'), new Signal('OtherName')], (action: Action<any>) => {
 			if (action.getName() === 'MyName') {
 				countOfExecutionOne++;
 			}
@@ -173,9 +173,9 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should unbind asterisk * binded callback', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var dispatcher = new Dispatcher();
-		var asteriskActionBinding = dispatcher.bind(new Signal('*'), (action: Action<any>) => {
+		let countOfExecutionOne = 0;
+		const dispatcher = new Dispatcher();
+		const asteriskActionBinding = dispatcher.bind(new Signal('*'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));
@@ -195,9 +195,9 @@ describe('Flux.Dispatcher', () => {
 	});
 
 	it('should throw exception if unbind more than once', (done: Function) => {
-		var countOfExecutionOne = 0;
-		var dispatcher = new Dispatcher();
-		var asteriskActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
+		let countOfExecutionOne = 0;
+		const dispatcher = new Dispatcher();
+		const asteriskActionBinding = dispatcher.bind(new Signal('MyName'), (action: Action<any>) => {
 			countOfExecutionOne++;
 		});
 		dispatcher.dispatch(new Action('MyName'));

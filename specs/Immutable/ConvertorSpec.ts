@@ -63,17 +63,17 @@ class User {
 
 describe('Immutable.Convertor', () => {
 
-	var entityStorage = new EntityStorage();
-	var convertor = new Convertor(entityStorage);
+	const entityStorage = new EntityStorage();
+	const convertor = new Convertor(entityStorage);
 
 	beforeEach(() => {
 		setEntityStorage(entityStorage);
 	});
 
 	it('should return JS object of entity', () => {
-		var skype = new Skype('misak113');
-		var address = new Address('Falešná');
-		var user = new User('Michael', address);
+		const skype = new Skype('misak113');
+		const address = new Address('Falešná');
+		let user = new User('Michael', address);
 		user = user.setSkype(skype);
 		expect(convertor.convertToJS(User, user)).toEqual({
 			name: 'Michael',
@@ -87,7 +87,7 @@ describe('Immutable.Convertor', () => {
 	});
 
 	it('should return entity by JS object', () => {
-		var user = convertor.convertFromJS(User, {
+		const user = convertor.convertFromJS(User, {
 			name: 'Michael',
 			address: {
 				street: 'Falešná'
@@ -105,16 +105,16 @@ describe('Immutable.Convertor', () => {
 	});
 
 	it('should convert to & then from JS to be same instance', () => {
-		var skype = new Skype('misak113');
-		var address = new Address('Falešná');
-		var user = new User('Michael', address);
+		const skype = new Skype('misak113');
+		const address = new Address('Falešná');
+		let user = new User('Michael', address);
 		user = user.setSkype(skype);
-		var convertedUser = convertor.convertFromJS(User, convertor.convertToJS(User, user));
+		const convertedUser = convertor.convertFromJS(User, convertor.convertToJS(User, user));
 		expect(convertedUser).toBe(user);
 	});
 
 	it('should return same instance if data are same', () => {
-		var data = {
+		const data = {
 			name: 'Michael',
 			address: {
 				street: 'Falešná'
@@ -123,27 +123,27 @@ describe('Immutable.Convertor', () => {
 				nickName: 'misak113'
 			}
 		};
-		var user1 = convertor.convertFromJS(User, data);
-		var user2 = convertor.convertFromJS(User, data);
+		const user1 = convertor.convertFromJS(User, data);
+		const user2 = convertor.convertFromJS(User, data);
 		expect(user1).toBe(user2);
 	});
 
 	it('should diff & patch entity to be same result entity', () => {
-		var skype = new Skype('misak113');
-		var address = new Address('Falešná');
-		var user = new User('Michael', address);
+		const skype = new Skype('misak113');
+		const address = new Address('Falešná');
+		let user = new User('Michael', address);
 		user = user.setSkype(skype);
 
-		var changedSkype = skype.setNickName('oleg');
-		var changedUser = user.setSkype(changedSkype);
+		const changedSkype = skype.setNickName('oleg');
+		const changedUser = user.setSkype(changedSkype);
 
-		var ops = convertor.diff(User, user, changedUser);
+		const ops = convertor.diff(User, user, changedUser);
 
 		expect(ops.toJS()).toEqual([
 			{ op: 'replace', path: '/skype/nickName', value: 'oleg' }
 		]);
 
-		var patchedUser = convertor.patch(User, user, ops);
+		const patchedUser = convertor.patch(User, user, ops);
 
 		expect(patchedUser).toBe(changedUser);
 		expect(user.getSkype()).toBe(skype);
