@@ -75,7 +75,7 @@ export default class Router extends Component<{}, {}, RouterContext> {
 		} else if (renderProps) {
 			const totalTime = process.hrtime(startTime);
 			const clientId = this.generateClientId();
-			const Component = renderProps.components[renderProps.components.length - 1]; // TODO
+			const Component = renderProps.components[renderProps.components.length - 1];
 			let initialState: { [stateName: string]: any } = {};
 			const StatesStatic = Reflect.getMetadata(DefaultProps, Component);
 			Object.keys(StatesStatic).map((stateName: string) => {
