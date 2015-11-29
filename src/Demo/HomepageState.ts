@@ -1,8 +1,8 @@
 
 import Entity from '../Immutable/Entity';
-import name from '../Addressing/name';
+import resource from '../Addressing/resource';
 
-@name('/homepage')
+@resource('/homepage')
 @Entity
 export default class HomepageState {
 

@@ -1,12 +1,12 @@
 
 import ResourceFactory from '../../src/Addressing/ResourceFactory';
-import name from '../../src/Addressing/name';
+import resource from '../../src/Addressing/resource';
 
 describe('Addressing.ResourceFactory', () => {
 
 	const resourceFactory = new ResourceFactory();
 
-	@name('/my-state')
+	@resource('/my-state')
 	class MyState {}
 
 	it('shoud return resource with string identifier of store state with params', () => {
