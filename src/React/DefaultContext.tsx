@@ -1,7 +1,9 @@
 /// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
 import 'reflect-metadata';
+/* tslint:disable */
 import * as React from 'react';
+/* tslint:enable */
 import {PropTypes, ComponentClass, ValidationMap} from 'react';
 import ReactComponent from './Component';
 import {Injector} from 'di';

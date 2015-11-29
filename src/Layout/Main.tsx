@@ -1,9 +1,8 @@
 
 import * as React from 'react';
-import Component from '../React/Component';
 import Navigation from './Navigation';
 
-export default class Main extends Component<{ children: any[]; location: any; }, {}, {}> {
+export default class Main extends React.Component<{ children: any[]; location: any; }, {}> {
 
 	render() {
 		return (

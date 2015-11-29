@@ -1,5 +1,7 @@
 
+/* tslint:disable */
 import * as React from 'react';
+/* tslint:enable */
 import Main from '../Layout/Main';
 import Homepage from '../Demo/Homepage';
 import UsersPage from '../Demo/User/UsersPage';

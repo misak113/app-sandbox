@@ -1,6 +1,5 @@
 
 import * as React from 'react';
-import Component from '../React/Component';
 import TogglerButton from './TogglerButton';
 import {classNames} from '../React/helper';
 import {List, Map} from 'immutable';
@@ -8,7 +7,7 @@ import {List, Map} from 'immutable';
 var Link = require('react-router').Link;
 /* tslint:enable */
 
-export default class Navigation extends Component<{ activePath: string; }, { items?: List<Map<string, string>> }, {}> {
+export default class Navigation extends React.Component<{ activePath: string; }, { items?: List<Map<string, string>> }> {
 
 	componentWillMount() {
 		this.setState({
