@@ -1,8 +1,8 @@
 
 import {Inject} from 'di-ts';
 import Dispatcher from '../Flux/Dispatcher';
-import { HomepageSignals } from './HomepageActions';
-import { StateActions } from '../State/State';
+import { ChangeStatus } from './HomepageActions';
+import { Update } from '../State/StateActions';
 import StateStore from '../State/StateStore';
 import HomepageState from './HomepageState';
 import ResourceFactory from '../Addressing/ResourceFactory';
@@ -13,13 +13,11 @@ export default class HomepageStore extends Store<HomepageState> {
 
 	constructor(
 		private dispatcher: Dispatcher,
-		private statusSignals: HomepageSignals,
-		private stateActions: StateActions,
 		private resourceFactory: ResourceFactory,
 		private stateStore: StateStore
 	) {
 		super(HomepageState);
-		this.dispatcher.bind(this.statusSignals.changeStatus(), () => this.changeStatus());
+		this.dispatcher.bind(ChangeStatus, () => this.changeStatus());
 	}
 
 	getState(params: { [name: string]: string }) {
@@ -31,11 +29,11 @@ export default class HomepageStore extends Store<HomepageState> {
 		const resourceTarget = this.resourceFactory.get(HomepageState, {});
 		const originalState = this.getState({});
 		const nextState = originalState.toggleStatus();
-		this.dispatcher.dispatch(this.stateActions.update(
-			HomepageState,
+		this.dispatcher.dispatch(new Update({
+			StateClass: HomepageState,
+			resourceTarget,
 			originalState,
-			nextState,
-			resourceTarget
-		));
+			nextState
+		}));
 	}
 }

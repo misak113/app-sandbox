@@ -1,8 +1,9 @@
 
 import {EventEmitter} from 'events';
 import Action from './Action';
-import Signal from './Signal';
+import IClassStatic from './IClassStatic';
 import Binding from './Binding';
+import ResourceTarget from '../Addressing/ResourceTarget';
 import { FluxDispatcherUnbindException } from './exceptions';
 
 export default class Dispatcher {
@@ -13,31 +14,37 @@ export default class Dispatcher {
 		this.eventEmitter = new EventEmitter();
 	}
 
-	dispatch<Payload>(action: Action<Payload>) {
+	dispatch<A extends Action<any>>(action: A) {
 		setTimeout(() => {
-			this.eventEmitter.emit(action.getName(), action);
+			this.eventEmitter.emit(action.constructor.toString(), action);
 			// AnySignal = *
 			this.eventEmitter.emit('*', action);
 		});
 		return this;
 	}
 
-	bind<Payload>(signal: Signal<any> | Signal<any>[], callback: (action: Action<Payload>) => void) {
-		const signals: Signal<any>[] = signal instanceof Signal ? [<Signal<any>>signal] : <Signal<any>[]>signal;
-		signals.forEach((signal: Signal<any>) => {
-			this.eventEmitter.addListener(signal.getName(), callback);
+	bind<A extends Action<any>>(
+		ActionStatic: IClassStatic<A> | IClassStatic<A>[],
+		callback: (action: A) => void,
+		resourceTarget?: ResourceTarget // TODO
+	) {
+		const ActionStatics: IClassStatic<A>[] = typeof ActionStatic === 'Array'
+			? ActionStatic as IClassStatic<A>[]
+			: [ActionStatic as IClassStatic<A>];
+		ActionStatics.forEach((ActionStatic: IClassStatic<A>) => {
+			this.eventEmitter.addListener(ActionStatic.toString(), callback);
 		});
 
-		return new Binding(signals, callback);
+		return new Binding(ActionStatics, callback);
 	}
 
-	unbind<Payload>(binding: Binding<Payload>) {
-		binding.getSignals().forEach((signal: Signal<any>) => {
+	unbind<A extends Action<any>>(binding: Binding<A>) {
+		binding.getActionStatics().forEach((ActionStatic: IClassStatic<A>) => {
 			const callback = binding.getCallback();
-			if (this.eventEmitter.listeners(signal.getName()).indexOf(callback) === -1) {
+			if (this.eventEmitter.listeners(ActionStatic.toString()).indexOf(callback) === -1) {
 				throw new FluxDispatcherUnbindException('Try to unbind not binded Binding', binding);
 			}
-			this.eventEmitter.removeListener(signal.getName(), callback);
+			this.eventEmitter.removeListener(ActionStatic.toString(), callback);
 		});
 		return this;
 	}

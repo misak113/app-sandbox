@@ -2,10 +2,9 @@
 
 import 'reflect-metadata';
 import * as React from 'react';
-import Action from '../Flux/Action';
 import Binding from '../Flux/Binding';
 import { fromJS } from 'immutable';
-import { StateSignals, StateActions, IPatchPayload, IInitialStatePayload } from '../State/State';
+import { Patch, InitialState, Subscribe, Initialize, Unsubscribe } from '../State/StateActions';
 import Dispatcher from '../Flux/Dispatcher';
 import Convertor from '../Immutable/Convertor';
 import ResourceFactory from '../Addressing/ResourceFactory';
@@ -18,8 +17,6 @@ export class Context {
 	constructor(
 		public convertor: Convertor,
 		public dispatcher: Dispatcher,
-		public stateSignals: StateSignals,
-		public stateActions: StateActions,
 		public resourceFactory: ResourceFactory
 	) { }
 }
@@ -38,8 +35,8 @@ export default function DefaultProps(StatesStatic: { [stateName: string]: any })
 
 			context: Context;
 			private bindings: {
-				patchBinding: Binding<IPatchPayload>;
-				stateBinding: Binding<IInitialStatePayload>;
+				patchBinding: Binding<Patch>;
+				stateBinding: Binding<InitialState>;
 			}[];
 
 			constructor(props: any, context: any) {
@@ -61,30 +58,32 @@ export default function DefaultProps(StatesStatic: { [stateName: string]: any })
 				this.bindings = Object.keys(StatesStatic).map((stateName: string) => {
 					const StateStatic = StatesStatic[stateName];
 					const resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);
-					this.context.dispatcher.dispatch(this.context.stateActions.subscribe(resourceTarget));
+					this.context.dispatcher.dispatch(new Subscribe(resourceTarget));
 					const patchBinding = this.context.dispatcher.bind(
-						this.context.stateSignals.patch(resourceTarget),
-						(action: Action<IPatchPayload>) => {
+						Patch,
+						(action: Patch) => {
 							const nextState = this.context.convertor.patch(
 								StateStatic,
 								this.state[stateName],
 								fromJS(action.getPayload())
 							);
 							this.setState({ [stateName]: nextState });
-						}
+						},
+						resourceTarget
 					);
 					const stateBinding = this.context.dispatcher.bind(
-						this.context.stateSignals.initialState(resourceTarget),
-						(action: Action<IInitialStatePayload>) => {
+						InitialState,
+						(action: InitialState) => {
 							const nextState = this.context.convertor.convertFromJS(
 								StateStatic,
 								action.getPayload()
 							);
 							this.setState({ [stateName]: nextState });
-						}
+						},
+						resourceTarget
 					);
 					if (initializeState) {
-						this.context.dispatcher.dispatch(this.context.stateActions.initialize(resourceTarget));
+						this.context.dispatcher.dispatch(new Initialize(resourceTarget));
 					}
 					return { patchBinding, stateBinding };
 				});
@@ -92,8 +91,8 @@ export default function DefaultProps(StatesStatic: { [stateName: string]: any })
 
 			componentWillUnmount() {
 				this.bindings.forEach(({ patchBinding, stateBinding }: {
-					patchBinding: Binding<IPatchPayload>;
-					stateBinding: Binding<IInitialStatePayload>;
+					patchBinding: Binding<Patch>;
+					stateBinding: Binding<InitialState>;
 				}) => {
 					this.context.dispatcher
 						.unbind(patchBinding)
@@ -102,7 +101,7 @@ export default function DefaultProps(StatesStatic: { [stateName: string]: any })
 				Object.keys(StatesStatic).forEach((stateName: string) => {
 					const StateStatic = StatesStatic[stateName];
 					const resourceTarget = this.context.resourceFactory.get(StateStatic, this.props.params);
-					this.context.dispatcher.dispatch(this.context.stateActions.unsubscribe(resourceTarget));
+					this.context.dispatcher.dispatch(new Unsubscribe(resourceTarget));
 				});
 			}
 

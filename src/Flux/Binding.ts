@@ -1,14 +1,14 @@
 
 import Action from './Action';
-import Signal from './Signal';
+import IClassStatic from './IClassStatic';
 
-export default class Binding<Payload> {
+export default class Binding<A extends Action<any>> {
 
-	getSignals() { return this.signals; }
+	getActionStatics() { return this.ActionStatics; }
 	getCallback() { return this.callback; }
 
 	constructor(
-		private signals: Signal<any>[],
-		private callback: (action: Action<Payload>) => void
+		private ActionStatics: IClassStatic<A>[],
+		private callback: (action: A) => void
 	) {}
 }

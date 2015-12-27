@@ -1,14 +1,16 @@
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts"/>
 
+import 'reflect-metadata';
 import {Inject} from 'di-ts';
 import ServerSocket from './ServerSocket';
 import Action from '../Flux/Action';
-import AnySignal from '../Flux/AnySignal';
 import Dispatcher from '../Flux/Dispatcher';
 import DispatcherNamespace from './DispatcherNamespace';
 import ClientSource from '../Addressing/ClientSource';
 import ResourceTarget from '../Addressing/ResourceTarget';
-import { StateSignals, ISubscribePayload, IUnsubscribePayload } from '../State/State';
+import { Subscribe, Unsubscribe } from '../State/StateActions';
 import { Map } from 'immutable';
+import * as actionAnnotation from './action';
 
 @Inject
 export default class ServerDispatcher {
@@ -18,20 +20,13 @@ export default class ServerDispatcher {
 	constructor(
 		private namespace: DispatcherNamespace,
 		private socket: ServerSocket,
-		private dispatcher: Dispatcher,
-		private stateSignals: StateSignals
+		private dispatcher: Dispatcher
 	) {
-		this.dispatcher.bind(
-			this.stateSignals.subscribe(),
-			(action: Action<ISubscribePayload>) => this.subscribe(action)
-		);
-		this.dispatcher.bind(
-			this.stateSignals.unsubscribe(),
-			(action: Action<IUnsubscribePayload>) => this.unsubscribe(action)
-		);
+		this.dispatcher.bind(Subscribe, (action: Subscribe) => this.subscribe(action));
+		this.dispatcher.bind(Unsubscribe, (action: Unsubscribe) => this.unsubscribe(action));
 	}
 
-	private subscribe(action: Action<ISubscribePayload>) {
+	private subscribe(action: Subscribe) {
 		if (!(action.getSource() instanceof ClientSource)) {
 			throw new Error(); // TODO
 		}
@@ -42,7 +37,7 @@ export default class ServerDispatcher {
 		socket.join(action.getPayload().identifier);
 	}
 
-	private unsubscribe(action: Action<IUnsubscribePayload>) {
+	private unsubscribe(action: Unsubscribe) {
 		if (!(action.getSource() instanceof ClientSource)) {
 			throw new Error(); // TODO
 		}
@@ -58,11 +53,11 @@ export default class ServerDispatcher {
 		namespace.on('connect', (socket: SocketIO.Socket) => {
 			socket.on('clientId', (clientId: string) => this.bind(socket, clientId));
 		});
-		this.dispatcher.bind(new AnySignal(), (action: Action<any>) => {
+		this.dispatcher.bind(Action, (action: Action<any>) => {
 			if (!(action.getSource() instanceof ClientSource)) {
 				const target = action.getTarget();
 				if (target instanceof ResourceTarget) {
-					namespace.to(target.getIdentifier()).emit('action', action.getName(), action.getPayload());
+					namespace.to(target.getIdentifier()).emit('action', this.getActionName(action), action.getPayload());
 				}
 			}
 		});
@@ -78,5 +73,12 @@ export default class ServerDispatcher {
 		});
 		socket.on('error', (error: Error) => console.error(error));
 		this.socketMap = this.socketMap.set(clientId, socket);
+	}
+
+	private getActionName(action: Action<any>) {
+		if (!Reflect.hasMetadata(actionAnnotation, action.constructor)) {
+			throw new Error('Action needs to have annotation'); // TODO
+		}
+		return Reflect.getMetadata(actionAnnotation, action.constructor);
 	}
 }

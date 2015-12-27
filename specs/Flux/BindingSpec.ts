@@ -1,21 +1,22 @@
 
 import Binding from '../../src/Flux/Binding';
 import Action from '../../src/Flux/Action';
-import Signal from '../../src/Flux/Signal';
 
 describe('Flux.Binding', () => {
+
+	class MyAction extends Action<{}> {}
 
 	it('should create instance of Binding with signals & callback', () => {
 		let was = null;
 		const binding = new Binding(
-			[new Signal('My.Namespace:NAME')],
-			(action: Action<any>) => { was = 'called: ' + action.getName(); }
+			[MyAction],
+			(action: Action<any>) => { was = 'called'; }
 		);
 		expect(binding instanceof Binding).toBeTruthy();
-		expect(binding.getSignals()).toEqual([new Signal('My.Namespace:NAME')]);
+		expect(binding.getActionStatics()).toEqual([MyAction]);
 		expect(typeof binding.getCallback() === 'function').toBeTruthy();
 
-		binding.getCallback()(new Action('My.Namespace:NAME'));
-		expect(was).toBe('called: My.Namespace:NAME');
+		binding.getCallback()(new MyAction());
+		expect(was).toBe('called');
 	});
 });

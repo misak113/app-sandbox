@@ -1,6 +1,6 @@
 
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
-import { StateActions, StateSignals, IPatchPayload } from '../../src/State/State';
+import { Patch, Update } from '../../src/State/StateActions';
 import ResourceTarget from '../../src/Addressing/ResourceTarget';
 import ResourceFactory from '../../src/Addressing/ResourceFactory';
 import StateStore from '../../src/State/StateStore';
@@ -8,7 +8,6 @@ import MyState from './MyState';
 import Convertor from '../../src/Immutable/Convertor';
 import EntityStorage from '../../src/Immutable/EntityStorage';
 import { setEntityStorage } from '../../src/Immutable/Entity';
-import Action from '../../src/Flux/Action';
 import Dispatcher from '../../src/Flux/Dispatcher';
 
 describe('State.StateStore', () => {
@@ -16,10 +15,8 @@ describe('State.StateStore', () => {
 	let dispatcher;
 	const entityStorage = new EntityStorage();
 	const convertor = new Convertor(entityStorage);
-	const stateActions = new StateActions(convertor);
-	const stateSignals = new StateSignals();
 	const resourceFactory = new ResourceFactory();
-	let clientStateStore;
+	let stateStore;
 
 	const clientStateBefore = new MyState({
 		a: 1
@@ -31,20 +28,25 @@ describe('State.StateStore', () => {
 	beforeEach(() => {
 		setEntityStorage(entityStorage);
 		dispatcher = new Dispatcher();
-		clientStateStore = new StateStore(
+		stateStore = new StateStore(
 			dispatcher,
-			stateActions,
-			stateSignals,
-			resourceFactory
+			resourceFactory,
+			convertor
 		);
 	});
 
 	it('should dispatch patch action after got update action', (done: Function) => {
 		let countOfCallbackExecuted = 0;
 		const resourceTarget = new ResourceTarget('myClientId');
-		dispatcher.dispatch(stateActions.update(MyState, clientStateBefore, clientStateAfter, resourceTarget));
-		dispatcher.bind(stateSignals.patch(resourceTarget), (action: Action<IPatchPayload>) => {
-			expect(action.getName()).toBe('State.State:patch');
+		const payload = {
+			StateClass: MyState,
+			resourceTarget,
+			originalState: clientStateBefore,
+			nextState: clientStateAfter
+		};
+		dispatcher.dispatch(new Update(payload));
+		dispatcher.bind(Patch, (action: Patch) => {
+			expect(action instanceof Patch);
 			expect(action.getPayload()).toEqual([{
 				op: 'replace',
 				path: '/a',
